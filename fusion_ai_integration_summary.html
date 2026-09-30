@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fusion 360 AI 연동 최적화 전략 요약</title>
+    <style>
+        :root {
+            --primary-color: #0696D7; /* Autodesk Blue-ish */
+            --secondary-color: #f3f4f6;
+            --text-color: #333;
+            --heading-color: #111;
+            --border-color: #e5e7eb;
+            --alert-bg: #fef2f2;
+            --alert-border: #f87171;
+            --success-bg: #f0fdf4;
+            --success-border: #4ade80;
+        }
+        
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #fafafa;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: var(--heading-color);
+            margin-top: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin-top: 25px;
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .alert {
+            background-color: var(--alert-bg);
+            border-left: 4px solid var(--alert-border);
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .success {
+            background-color: var(--success-bg);
+            border-left: 4px solid var(--success-border);
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #6b7280;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fusion 360 AI 연동 최적화 전략 리포트</h1>
+    
+    <div class="card">
+        <h3>🎯 프로젝트 의도 (User Intent)</h3>
+        <p>AI를 활용한 3D 생성 기술이 '단일 바디(One body)'를 만드는 것에 머무는 한계를 극복하고, <strong>Autodesk Fusion 360의 진정한 강점인 "다중 부품 조립(Assembly)"과 "기구학적 구동(Motion Simulation)"</strong>을 AI 연동 시스템으로 최적화 및 고도화하는 방법론을 모색합니다.</p>
+    </div>
+
+    <h2>1. 최신 기술 래퍼런스 분석</h2>
+    <p>서브에이전트가 조사한 '다중 부품 조립 및 모션 생성' 관련 최신 학계/산업계 동향입니다.</p>
+    <ul>
+        <li><strong>JoinABLe (Autodesk Research & MIT):</strong> 부품의 B-Rep(경계 표현) 기하학적 특성을 그래프 형태로 분석하여, 부품 간의 조인트(Joint) 위치와 축을 머신러닝으로 예측(약 79.5% 정확도). Fusion 360 Gallery Assembly Dataset 활용.</li>
+        <li><strong>Agentic CAD Generation (NVIDIA 등):</strong> LLM이 직접 형태를 그리는 대신 파라메트릭 CAD 코드(API 스크립트)를 작성. 실행 중 에러가 발생하면 에러 로그를 읽고 스스로 코드를 수정하는 자가 치유(Self-repair) 루프 프레임워크.</li>
+        <li><strong>Assembly-Aware Generation (CRAG):</strong> 부품 생성 전 결합 제약 조건(Mating constraints)을 미리 인지하고, 그 조건에 맞춰 부품의 형태를 역으로 깎아내는 기술.</li>
+    </ul>
+
+    <h2>2. 기존 4단계 로직에 대한 비판적 검토</h2>
+    <p>초기 제안된 인간 엔지니어의 정석적인 로직(Bottom-up)을 AI에 적용할 경우의 맹점입니다.</p>
+    
+    <ol>
+        <li>요구사항 체계적 분석</li>
+        <li>부품마다 스케치 선행 설계</li>
+        <li>스케치 바탕 3D 모델링</li>
+        <li>부품 조립(Assemble) 및 모션(Motion) 적용</li>
+    </ol>
+    
+    <div class="alert">
+        <strong>⚠️ 바텀업(Bottom-up) 방식의 치명적 맹점: "맹목적 조립(Blind Assembly)"</strong><br>
+        인간에게는 직관적이지만 AI(LLM)는 2D 공간 추론 능력이 취약합니다. 각 부품을 따로따로(in a vacuum) 만들게 되면 기하학적 오차가 누적되어, 마지막 4단계에서 부품의 축과 구멍이 정확히 맞물리지 않아 조인트 생성이 100% 실패하게 됩니다.
+    </div>
+
+    <h2>3. 최적화 솔루션: 탑다운(Top-down) 및 커넥터(Connector) 중심 아키텍처</h2>
+    <p>오차가 발생하는 바텀업 방식을 뒤집어, AI가 기하학적 오류 없이 조립을 완성할 수 있도록 유도하는 새로운 파이프라인입니다.</p>
+
+    <div class="success">
+        <strong>💡 핵심 전략: "관절(뼈대)을 먼저 선언하고, 부품(살)을 나중에 만든다."</strong>
+    </div>
+
+    <ul>
+        <li><strong>Step 1. 전역 스켈레톤 선언:</strong> 3D 공간 상에 관절이 들어갈 위치(Point)와 크기(Parameter)를 Fusion 전역 변수로 가장 먼저 확정합니다.</li>
+        <li><strong>Step 2. 커넥터(관절) 선행 생성:</strong> 정해진 위치에 결합을 위한 필수 기하학(구멍, 샤프트)만 허공에 먼저 생성합니다.</li>
+        <li><strong>Step 3. 살 붙이기 (Bridge Generation):</strong> AI에게 "미리 만든 두 커넥터 사이를 잇는 스케치를 그려라"라고 명령합니다. 이렇게 하면 부품 간 기하학적 붕괴가 원천 차단됩니다.</li>
+        <li><strong>Step 4. 조인트 확정 및 구동:</strong> 이미 완벽한 위치에 커넥터가 존재하므로, 조인트 API 실행 시 에러 없이 부드러운 모션 시뮬레이션이 가능합니다.</li>
+    </ul>
+
+    <h2>4. 시스템 실무 통합 가이드</h2>
+    <p>위의 개념을 실제 AI 연동 시스템에 녹여내기 위한 기술적 장치들입니다.</p>
+    <ul>
+        <li><span class="highlight">API 자가 검증 루프 (Self-Repair):</span> AI가 Fusion Python API 코드를 짜게 하고, 백그라운드에서 실행 시 조립 충돌(Interference) 에러가 나면 그 Traceback을 AI에게 넘겨 좌표를 자동 수정하도록 합니다.</li>
+        <li><span class="highlight">B-Rep 위상 데이터 주입:</span> 맹목적인 좌표(X,Y,Z) 결합을 피하기 위해, Fusion API로 추출한 특정 면(Face)이나 모서리(Edge)의 고유 ID를 프롬프트에 제공하여 조인트를 정확히 타겟팅하게 합니다.</li>
+        <li><span class="highlight">수학적 제약조건 강제:</span> 프롬프트 단에서 "두 기어 중심 거리는 (반경A+반경B) 수식을 반드시 따라야 한다"고 강제하여 스케치 오류를 방지합니다.</li>
+    </ul>
+
+    <footer>
+        문서 생성일: 2026-08-13 | AI-Fusion Integration Architecture Document
+    </footer>
+</div>
+
+</body>
+</html>

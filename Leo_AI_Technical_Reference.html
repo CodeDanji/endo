@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leo AI (getleo.ai) 심층 분석 및 엔지니어링 레퍼런스 보고서</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #090d16;
+            --bg-secondary: #111827;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-card-hover: rgba(30, 41, 59, 0.95);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-accent: rgba(56, 189, 248, 0.3);
+            
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-highlight: #38bdf8;
+            
+            --accent-blue: #38bdf8;
+            --accent-purple: #a855f7;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+
+            --gradient-primary: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+            --gradient-card: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        /* Top Navigation Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: var(--gradient-primary);
+            color: #fff;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Hero Banner */
+        .hero {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 48px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(168, 85, 247, 0.05) 70%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 850px;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        /* Card Component */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(56, 189, 248, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .card p, .card ul {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .card li {
+            position: relative;
+            padding-left: 22px;
+            margin-bottom: 10px;
+        }
+
+        .card li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        /* Section Title */
+        .section-header {
+            margin-top: 48px;
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-accent), transparent);
+        }
+
+        /* Data Tables */
+        .table-container {
+            overflow-x: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: rgba(17, 24, 39, 0.8);
+            color: var(--accent-blue);
+            font-weight: 700;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+        }
+
+        /* Code & Architecture Display */
+        pre {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #e6edf3;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .code-keyword { color: #ff7b72; }
+        .code-func { color: #d2a8ff; }
+        .code-string { color: #a5d6ff; }
+        .code-comment { color: #8b949e; font-style: italic; }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-info { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+
+        /* Diagram Box */
+        .diagram-box {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px dashed var(--accent-blue);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .diagram-flow {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .flow-step {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .flow-step h4 {
+            color: var(--accent-blue);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .flow-arrow {
+            color: var(--accent-purple);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 60px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo-area">
+            <span class="logo-badge">ENGINEERING AI</span>
+            <span class="logo-title">Leo AI (getleo.ai) 심층 분석 및 레퍼런스 보고서</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#overview">개요 및 핵심원리</a></li>
+                <li><a href="#features">기능 및 워크플로우</a></li>
+                <li><a href="#pricing">비용 및 요금제</a></li>
+                <li><a href="#installation">연동 및 설치</a></li>
+                <li><a href="#proscons">장단점</a></li>
+                <li><a href="#tech-ref">기술 레퍼런스</a></li>
+                <li><a href="#blueprint">Fusion 360 청사진</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- Hero Banner -->
+        <section class="hero" id="overview">
+            <span class="hero-tag">Generative CAD & AI Engineering Copilot</span>
+            <h1>Leo AI (getleo.ai) 종합 기술 분석 보고서</h1>
+            <p>기계공학 및 3D CAD 설계를 위한 차세대 엔지니어링 인공지능 코파일럿. LMM(Large Mechanical Model) 기반 3D B-rep 피처 생성, DFMA 실시간 검증, 사내 PDM/PLM 부품 재사용(Part Reuse) 및 Fusion 360 연동 파이프라인 분석.</p>
+        </section>
+
+        <!-- 1. 개요 및 구동 원리 -->
+        <div class="section-header">
+            <h2>1. 개요 및 구동 원리 (Architecture & Mechanisms)</h2>
+        </div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🧠</div>
+                    <h3>Large Mechanical Model (LMM)</h3>
+                </div>
+                <p>일반 범용 LLM(ChatGPT, Claude 등)과 달리, 기계공학 도메인 지식과 CAD Topology에 특화된 고유 AI 아키텍처입니다.</p>
+                <br>
+                <ul>
+                    <li><strong>100만+ 전문 출처 학습</strong>: ISO, ASME, DIN, MIL-SPEC 등 표준 규격서, 재료 물성 데이터, 기계요소 설계 도서 인덱싱.</li>
+                    <li><strong>3D Geometry & Topology 인식</strong>: 메타데이터 뿐만 아니라 3D B-rep(Boundary Representation) 형상 그래프(Face, Edge, Vertex)를 직접 연산.</li>
+                    <li><strong>수학적/물리적 제약조건 통합</strong>: 응력/하중, 재질 밀도, Machining Tolerance 등 물리 제약조건 기반 추론.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <h3>B-rep 기반 CAD 생성 메커니즘</h3>
+                </div>
+                <p>기존 AI의 메쉬(Mesh, STL/OBJ) 생성이 갖는 한계를 극복하고 CAD 프로그램 호환 파라메트릭 피처 트리를 생성합니다.</p>
+                <br>
+                <ul>
+                    <li><strong>Parametric Feature Tree 생성</strong>: Extrude, Revolve, Fillet, Hole 등 편집 가능한 CAD 스크립트 명령(Command Sequence)으로 변환.</li>
+                    <li><strong>CSG & Constraint Solver 연동</strong>: 2D 스케치 제약 조건(동심, 평행, 수직 등)을 수학적으로 풀이하여 B-rep Solid 모델링.</li>
+                    <li><strong>Native CAD Engine 호환</strong>: SolidWorks, Onshape, Fusion 360 등 기존 CAD 커널에서 직접 수정 가능.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 2. 주요 기능 및 사용법 -->
+        <div class="section-header" id="features">
+            <h2>2. 주요 기능 및 사용법 (Features & Workflow)</h2>
+        </div>
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">✏️</div>
+                    <h3>Prompt/Sketch-to-3D</h3>
+                </div>
+                <p>자연어 텍스트나 2D 컨셉 스케치를 입력받아 DFMA 적용된 3D CAD 어셈블리를 몇 초 만에 자동으로 생성합니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔍</div>
+                    <h3>Part Reuse (부품 재활용)</h3>
+                </div>
+                <p>회사 PDM/PLM 라이브러리를 인덱싱하여, 필요한 볼트 패턴/플랜지 형상의 기존 보유 부품을 기하학적 유사성으로 검색해 재활용합니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🛡️</div>
+                    <h3>Real-time DFMA Inspection</h3>
+                </div>
+                <p>최소 벽 두께, 구배 각도(Draft Angle), 가공 공구 접근성, 공차 및 간섭(Interference) 오류를 실시간 검단하고 플래그(Flag)를 표시합니다.</p>
+            </div>
+        </div>
+
+        <!-- 3. 비용 및 요금제 -->
+        <div class="section-header" id="pricing">
+            <h2>3. 비용 및 요금제 (Pricing & Plans)</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>요금제 Tier</th>
+                        <th>월 비용 (User/Mo)</th>
+                        <th>주요 제공 기능</th>
+                        <th>타겟 고객</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-info">Pro Plan</span></td>
+                        <td><strong>$15.00</strong></td>
+                        <td>개인 AI 코파일럿, 100만+ 표준 데이터베이스 Q&A, 기본 파라메트릭 생성 및 출처(Citation) 제공</td>
+                        <td>개인 엔지니어, 프리랜서, 프리랜스 디자이너</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-success">Business / Enterprise</span></td>
+                        <td><strong>Custom (견적)</strong></td>
+                        <td>사내 PDM/PLM(SolidWorks PDM, Vault, Windchill 등) 실시간 연동, 형상 기반 부품 재사용 검색, 기업 전용 LMM 학습, SSO/보안 구축</td>
+                        <td>중대형 하드웨어 기업, 자동차/항공우주/로봇 제조사</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-warning">Free Trial</span></td>
+                        <td><strong>무료 체험</strong></td>
+                        <td>getleo.ai 공식 웹사이트 데모 신청을 통한 개별 엔지니어링 데이터 테스트 지원</td>
+                        <td>도입 검토 단계 팀 및 기관</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 4. 연동 및 설치 방법 -->
+        <div class="section-header" id="installation">
+            <h2>4. CAD 연동 및 설치 방법 (Installation & Integration)</h2>
+        </div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">☁️</div>
+                    <h3>Onshape (Cloud Native Integration)</h3>
+                </div>
+                <ul>
+                    <li><strong>설치 방식</strong>: Onshape App Store ➔ "Leo AI" 검색 ➔ 구독 설정.</li>
+                    <li><strong>작동 메커니즘</strong>: REST API + Onshape FeatureScript 기반 웹 샌드박스 연동.</li>
+                    <li><strong>사용자 경험</strong>: Onshape 브라우저 UI 우측 태스크 패널에 Leo AI 탭 자동 추가.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💻</div>
+                    <h3>SolidWorks / Fusion 360 (Desktop Add-in)</h3>
+                </div>
+                <ul>
+                    <li><strong>설치 방식</strong>: 웹 포털에서 Windows `.exe` 인스톨러 다운로드 및 실행.</li>
+                    <li><strong>작동 메커니즘</strong>: SolidWorks C# COM Add-in / Fusion 360 Python Add-in (`adsk.fusion`).</li>
+                    <li><strong>사용자 경험</strong>: CAD 소프트웨어 재시작 후 툴바 사이드바(Task Pane/Palette) 패널 활성화.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 5. 장단점 분석 -->
+        <div class="section-header" id="proscons">
+            <h2>5. 장단점 및 한계 분석 (Pros & Cons)</h2>
+        </div>
+        <div class="grid-2">
+            <div class="card" style="border-top: 4px solid var(--accent-emerald);">
+                <h3 style="color: var(--accent-emerald); margin-bottom: 14px;">👍 핵심 장점 (Advantages)</h3>
+                <ul>
+                    <li><strong>피처 트리 살린 B-rep CAD 출력</strong>: 메쉬 덩어리가 아닌 CAD 커널 수정 가능 모델 생성.</li>
+                    <li><strong>출처 제시를 통한 높은 신뢰성</strong>: 답변 시 표준 규격 문서 조항 Citation 표기로 환각 최소화.</li>
+                    <li><strong>기존 CAD 환경 유지</strong>: 별도 툴 이동 없이 SolidWorks/Fusion 360 내에서 바로 구동.</li>
+                    <li><strong>BOM 비용 절감</strong>: 형상 기반 부품 재활용(Part Reuse)으로 중복 발주 차단.</li>
+                </ul>
+            </div>
+            <div class="card" style="border-top: 4px solid var(--accent-rose);">
+                <h3 style="color: var(--accent-rose); margin-bottom: 14px;">👎 한계 및 고려사항 (Limitations)</h3>
+                <ul>
+                    <li><strong>사내 PDM 데이터 상태 의존성</strong>: PDM 데이터 정리가 안 되어 있으면 부품 검색 성능 저하.</li>
+                    <li><strong>엔지니어 검증 필수 (Copilot 개념)</strong>: 완벽한 자율 설계가 아니므로 물리적 최종 검증은 필수.</li>
+                    <li><strong>초기 구축 비용</strong>: Enterprise 환경의 PDM API 구축 및 보안 인증에 일정 비용/시간 소요.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 6. 심층 기술 레퍼런스 -->
+        <div class="section-header" id="tech-ref">
+            <h2>6. CAD AI 심층 기술 레퍼런스 (Technical Reference)</h2>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">3D CAD AI 시장에서 다루어지는 핵심 기술 방식 패러다임과 업계 대안 기술 비교입니다.</p>
+
+        <div class="diagram-box">
+            <h3 style="color: var(--accent-blue); font-size: 18px; margin-bottom: 10px;">CAD AI 파이프라인 패러다임 비교</h3>
+            <div class="diagram-flow">
+                <div class="flow-step">
+                    <h4>Mesh AI Paradigm</h4>
+                    <p style="font-size: 12px; color: var(--text-muted);">SDF / NeRF / Gaussian</p>
+                    <p style="font-size: 13px; color: var(--accent-rose); margin-top: 6px;">❌ 메쉬(STL) 출력, CAD 수정 불가</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <h4>B-rep Diffusion</h4>
+                    <p style="font-size: 12px; color: var(--text-muted);">Autodesk BrepGen</p>
+                    <p style="font-size: 13px; color: var(--accent-amber); margin-top: 6px;">⚠️ 수학적 곡면 생성, 피처 미비</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step" style="border-color: var(--accent-emerald);">
+                    <h4>LMM Sequence AI</h4>
+                    <p style="font-size: 12px; color: var(--accent-emerald);">Leo AI / Zoo.dev / LMM</p>
+                    <p style="font-size: 13px; color: var(--accent-emerald); margin-top: 6px;">✅ B-rep 피처 트리 편집 가능</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>플랫폼 / 기술</th>
+                        <th>출력 데이터 형식</th>
+                        <th>CAD 피처 트리 지원</th>
+                        <th>주요 특장점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Leo AI (LMM)</strong></td>
+                        <td>Native B-rep Solid (CAD File / API)</td>
+                        <td><span class="badge badge-success">지원 (Full Tree)</span></td>
+                        <td>LMM 기반 100만+ 레퍼런스 RAG, DFMA 실시간 검증, 사내 PDM 형상 검색 연동</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Zoo.dev (KittyCAD)</strong></td>
+                        <td>KCL (KittyCAD Language) Script ➔ STEP</td>
+                        <td><span class="badge badge-success">지원 (Code-CAD)</span></td>
+                        <td>오픈소스 선호 프로그래머블 CAD 코딩 엔진, 텍스트-to-KCL 연산 파이프라인</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Autodesk Project Bernini</strong></td>
+                        <td>Generative B-rep Primitive</td>
+                        <td><span class="badge badge-warning">부분 지원 (연구 단계)</span></td>
+                        <td>Autodesk 파운데이션 3D B-rep 생성 파운데이션 모델</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Code-CAD (Build123d / CadQuery)</strong></td>
+                        <td>Python Script ➔ STEP / BREP</td>
+                        <td><span class="badge badge-info">개발자 직접 작성</span></td>
+                        <td>OpenCASCADE 기반 파이썬 코드 알고리즘 3D 모델링 프레임워크</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 7. Fusion 360 연동 프로젝트 청사진 -->
+        <div class="section-header" id="blueprint">
+            <h2>7. Fusion 360 프로젝트(`ENDO`) 적용 기술 청사진 (Blueprint)</h2>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">🚀</div>
+                <h3>`ENDO` 프로젝트 반영 파이프라인 설계</h3>
+            </div>
+            <p>Leo AI의 아키텍처를 벤치마킹하여 현재 Fusion 360 파이썬 스크립트(`build_endocrab_model.py`) 연동 방식을 고도화하는 4단계 아키텍처 플랜입니다.</p>
+
+            <pre>
+<span class="code-comment"># 1. Custom Palette UI (HTML/JS Webview) + Fusion 360 IPC Handler</span>
+<span class="code-keyword">import</span> adsk.core, adsk.fusion
+
+<span class="code-func">def create_leo_style_palette</span>(app):
+    ui = app.userInterface
+    palette = ui.palettes.itemById(<span class="code-string">"EndocrabAIPalette"</span>)
+    <span class="code-keyword">if</span> <span class="code-keyword">not</span> palette:
+        palette = ui.palettes.add(
+            <span class="code-string">"EndocrabAIPalette"</span>, 
+            <span class="code-string">"ENDOCRAB AI Engineering Copilot"</span>, 
+            <span class="code-string">"ui/index.html"</span>, <span class="code-comment"># HTML/JS Glassmorphic Chat Panel</span>
+            True, True, True, 350, 600
+        )
+
+<span class="code-comment"># 2. LLM Code Generation & Dynamic Execution Loop</span>
+<span class="code-func">def execute_ai_generated_cad_script</span>(python_code_str):
+    <span class="code-comment"># DFMA 및 안전성 검증 후 exec() 구동</span>
+    exec_globals = {<span class="code-string">"adsk"</span>: adsk, <span class="code-string">"app"</span>: adsk.core.Application.get()}
+    <span class="code-keyword">exec</span>(python_code_str, exec_globals)
+            </pre>
+            <br>
+            <ul>
+                <li><strong>Step 1. Fusion 360 Custom Palette 탑재</strong>: `ui.palettes.add()`를 사용하여 CAD 사이드바에 웹패널 탑재.</li>
+                <li><strong>Step 2. LLM 프롬프트 프레임워크 구축</strong>: Fusion 360 Python API 메소드(`adsk.fusion.Component.features`) 문맥을 템플릿화하여 LLM 코드 생성율 최적화.</li>
+                <li><strong>Step 3. DFMA Validation Check</strong>: 코드 실행 전 최소 두께, 간섭 및 구멍 깊이 비율 사전 사양 검증.</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Generated by Antigravity AI Engineering Assistant | Based on getleo.ai & Modern CAD AI Technologies | Local Time: 2026-08-10</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>

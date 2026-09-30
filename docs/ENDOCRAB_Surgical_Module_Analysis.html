@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENDOCRAB 수술 모듈 분석 & 디자인 스펙 — Fusion 360 사전 문서</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #04060d;
+            --bg-surface: rgba(10, 16, 32, 0.92);
+            --bg-surface-2: rgba(16, 24, 48, 0.88);
+            --bg-surface-3: rgba(22, 30, 56, 0.85);
+            --bg-code: #080e1c;
+            --border-subtle: rgba(56, 189, 248, 0.15);
+            --border-accent: rgba(56, 189, 248, 0.45);
+            --border-glow: rgba(56, 189, 248, 0.7);
+            --primary: #38bdf8;
+            --primary-dim: #0ea5e9;
+            --secondary: #818cf8;
+            --accent: #f43f5e;
+            --accent-warm: #fb923c;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-dim: #475569;
+            --gradient-hero: linear-gradient(135deg, #0ea5e9 0%, #818cf8 50%, #f43f5e 100%);
+            --gradient-warm: linear-gradient(135deg, #f43f5e 0%, #fb923c 100%);
+            --gradient-cool: linear-gradient(135deg, #0ea5e9 0%, #34d399 100%);
+            --gradient-purple: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            --shadow-lg: 0 25px 50px -12px rgba(0,0,0,0.6);
+            --shadow-xl: 0 35px 60px -15px rgba(0,0,0,0.7);
+            --shadow-glow: 0 0 40px rgba(56, 189, 248, 0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 15% 10%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 20%, rgba(129, 140, 248, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(244, 63, 94, 0.04) 0%, transparent 50%);
+        }
+
+        .container { max-width: 1380px; margin: 0 auto; padding: 1.5rem; }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56,189,248,0.5); }
+
+        /* ── Hero Header ── */
+        .hero {
+            text-align: center;
+            padding: 3.5rem 2rem 3rem;
+            background: var(--bg-surface);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 28px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--gradient-hero);
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -120px; right: -120px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(129,140,248,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+        }
+        .hero .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 720px;
+            margin: 0 auto 1.5rem;
+        }
+        .badge-row {
+            display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            border: 1px solid;
+        }
+        .badge-blue { color: var(--primary); background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.25); }
+        .badge-purple { color: var(--secondary); background: rgba(129,140,248,0.1); border-color: rgba(129,140,248,0.25); }
+        .badge-red { color: var(--accent); background: rgba(244,63,94,0.1); border-color: rgba(244,63,94,0.25); }
+        .badge-green { color: var(--success); background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.25); }
+        .badge-orange { color: var(--accent-warm); background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.25); }
+
+        /* ── Navigation ── */
+        .toc {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1.75rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+        .toc h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.5rem;
+        }
+        .toc a {
+            display: block;
+            padding: 0.6rem 1rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-xs);
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+        }
+        .toc a:hover {
+            background: rgba(56,189,248,0.08);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        /* ── Section ── */
+        .section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+        }
+        .section-blue::before { background: var(--gradient-cool); }
+        .section-purple::before { background: var(--gradient-purple); }
+        .section-red::before { background: var(--gradient-warm); }
+        .section-green::before { background: linear-gradient(180deg, #34d399, #059669); }
+
+        .section h2 {
+            font-size: 1.65rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 0.65rem;
+        }
+        .section h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1.8rem 0 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-warm);
+            margin: 1.2rem 0 0.5rem;
+        }
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        /* ── Spec Table ── */
+        .spec-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.25rem 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+        .spec-table thead th {
+            background: rgba(56,189,248,0.1);
+            color: var(--primary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 0.85rem 1.1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .spec-table tbody td {
+            padding: 0.75rem 1.1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(56,189,248,0.06);
+            vertical-align: top;
+        }
+        .spec-table tbody tr:last-child td { border-bottom: none; }
+        .spec-table tbody tr:hover td { background: rgba(56,189,248,0.04); }
+        .spec-table .val {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.88rem;
+        }
+        .spec-table .unit {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+        .spec-table .label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ── Cards Grid ── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+        .card {
+            background: var(--bg-surface-2);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+        .card-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+        .card-icon-blue { background: rgba(56,189,248,0.12); }
+        .card-icon-purple { background: rgba(129,140,248,0.12); }
+        .card-icon-red { background: rgba(244,63,94,0.12); }
+        .card-icon-green { background: rgba(52,211,153,0.12); }
+        .card-icon-orange { background: rgba(251,146,60,0.12); }
+        .card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ── Procedure Steps ── */
+        .steps { counter-reset: step; margin: 1rem 0; }
+        .step {
+            display: flex;
+            gap: 1.2rem;
+            padding: 1.1rem 0;
+            border-bottom: 1px solid rgba(56,189,248,0.06);
+            align-items: flex-start;
+        }
+        .step:last-child { border-bottom: none; }
+        .step-num {
+            counter-increment: step;
+            flex-shrink: 0;
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(56,189,248,0.1);
+            border: 1px solid rgba(56,189,248,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+        .step-content h5 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+        .step-content p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ── Highlight Box ── */
+        .highlight-box {
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-sm);
+            margin: 1.25rem 0;
+            border-left: 4px solid;
+        }
+        .highlight-info {
+            background: rgba(56,189,248,0.06);
+            border-left-color: var(--primary);
+        }
+        .highlight-warning {
+            background: rgba(251,191,36,0.06);
+            border-left-color: var(--warning);
+        }
+        .highlight-success {
+            background: rgba(52,211,153,0.06);
+            border-left-color: var(--success);
+        }
+        .highlight-danger {
+            background: rgba(244,63,94,0.06);
+            border-left-color: var(--accent);
+        }
+        .highlight-box strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        .highlight-box p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0.4rem 0 0;
+        }
+
+        /* ── Comparison Grid ── */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+        .compare-item {
+            background: var(--bg-surface-2);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .compare-item h4 {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .compare-item .big-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .compare-item .sub-val {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* ── Blueprint Diagram ── */
+        .blueprint {
+            background: #071020;
+            border: 1px solid rgba(56,189,248,0.2);
+            border-radius: var(--radius-sm);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+            background-image:
+                linear-gradient(rgba(56,189,248,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56,189,248,0.06) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .blueprint-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(56,189,248,0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        .dim-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px dashed rgba(56,189,248,0.15);
+        }
+        .dim-row:last-child { border-bottom: none; }
+        .dim-label {
+            flex: 1;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+        .dim-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--warning);
+            min-width: 100px;
+            text-align: right;
+        }
+        .dim-arrow {
+            color: rgba(56,189,248,0.4);
+            font-size: 0.8rem;
+        }
+
+        /* ── Flow Diagram ── */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .flow-node {
+            background: var(--bg-surface-2);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xs);
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 120px;
+        }
+        .flow-arrow {
+            color: var(--primary);
+            font-size: 1.2rem;
+            padding: 0 0.3rem;
+        }
+
+        /* ── Data Bar ── */
+        .data-bar-container { margin: 1rem 0; }
+        .data-bar-item {
+            margin-bottom: 0.8rem;
+        }
+        .data-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+        .data-bar-label span:first-child { color: var(--text-secondary); font-weight: 500; }
+        .data-bar-label span:last-child { color: var(--primary); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .data-bar-track {
+            height: 8px;
+            background: rgba(56,189,248,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .data-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1.5s ease;
+        }
+        .fill-blue { background: var(--gradient-cool); }
+        .fill-purple { background: var(--gradient-purple); }
+        .fill-red { background: var(--gradient-warm); }
+
+        /* ── Two Column Layout ── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        /* ── Reference List ── */
+        .ref-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        .ref-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(56,189,248,0.06);
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 0.75rem;
+        }
+        .ref-list li:last-child { border-bottom: none; }
+        .ref-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            width: 24px;
+        }
+        .ref-list a {
+            color: var(--info);
+            text-decoration: none;
+        }
+        .ref-list a:hover { text-decoration: underline; }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* ── Tags inline ── */
+        .tag-inline {
+            display: inline-block;
+            padding: 0.15rem 0.55rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 4px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .tag-steel { color: #60a5fa; background: rgba(96,165,250,0.12); }
+        .tag-nylon { color: #34d399; background: rgba(52,211,153,0.12); }
+        .tag-critical { color: #f43f5e; background: rgba(244,63,94,0.12); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .two-col, .compare-grid { grid-template-columns: 1fr; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .toc-grid { grid-template-columns: 1fr; }
+            .section { padding: 1.5rem; }
+            .flow-container { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ═══════════════ HERO ═══════════════ -->
+    <header class="hero">
+        <div class="badge-row">
+            <span class="badge badge-blue">Nature Scientific Reports 2024</span>
+            <span class="badge badge-purple">DOI: 10.1038/s41598-024-56484-6</span>
+            <span class="badge badge-red">Fusion 360 Pre-Design</span>
+            <span class="badge badge-green">Rev 2.0</span>
+        </div>
+        <h1>ENDOCRAB 수술 모듈 분석<br>& 디자인 스펙 문서</h1>
+        <p class="subtitle">
+            Ex vivo 돼지 위 천공 모델을 위한 ENDOCRAB 시스템의 구성 요소, 기구학, 작동 프로토콜, 그리고 
+            IIT Bombay Suture Ring Needle 참조를 포함한 Fusion 360 모델링 사전 분석 문서
+        </p>
+        <div class="badge-row" style="margin-top:1rem;">
+            <span class="badge badge-orange">자료 출처: 이미지 3장 + 논문 전문</span>
+        </div>
+    </header>
+
+    <!-- ═══════════════ TOC ═══════════════ -->
+    <nav class="toc">
+        <h2>📑 목차 (Table of Contents)</h2>
+        <div class="toc-grid">
+            <a href="#sec-overview">1. 시스템 개요 (System Overview)</a>
+            <a href="#sec-components">2. 구성 요소 상세 분석</a>
+            <a href="#sec-dimensions">3. 핵심 치수 스펙 (Critical Dimensions)</a>
+            <a href="#sec-main-body">4. Main Body 설계 분석</a>
+            <a href="#sec-gripper">5. Gripper 메커니즘 분석</a>
+            <a href="#sec-needle">6. Ring-Shaped Needle 분석</a>
+            <a href="#sec-knotting">7. Knotting Device 분석</a>
+            <a href="#sec-handle">8. Handle & Wire 구동 시스템</a>
+            <a href="#sec-procedure">9. 수술 절차 (Surgical Procedure)</a>
+            <a href="#sec-performance">10. 성능 비교 데이터</a>
+            <a href="#sec-iit-ref">11. IIT Bombay 참조 디바이스 분석</a>
+            <a href="#sec-image-analysis">12. 제공 이미지 상세 분석</a>
+            <a href="#sec-fusion-mapping">13. Fusion 360 모델링 매핑</a>
+            <a href="#sec-references">14. 참고 문헌</a>
+        </div>
+    </nav>
+
+    <!-- ═══════════════ 1. SYSTEM OVERVIEW ═══════════════ -->
+    <section class="section section-blue" id="sec-overview">
+        <h2>🔬 1. 시스템 개요 (System Overview)</h2>
+        <p>
+            <strong>ENDOCRAB</strong>는 <em>ENDOscopic Continuous Ring-needle Approximation Body</em>의 약어로, 
+            Natural Orifice Transluminal Endoscopic Surgery (NOTES) 환경에서 위장관 천공(perforation)을 
+            연속 봉합(continuous suturing)으로 봉합하기 위해 설계된 내시경 봉합 디바이스입니다.
+        </p>
+
+        <div class="highlight-box highlight-info">
+            <strong>📋 핵심 컨셉</strong>
+            <p>
+                기존 TTSC(Through-the-Scope Clip)의 단속 봉합(interrupted suturing) 방식의 한계를 극복하여,
+                <strong>점막–점막하층(mucosal-submucosal layer)의 연속 봉합</strong>을 통해 
+                수동 봉합(hand suturing)에 준하는 봉합 강도를 달성하는 것이 목표입니다.
+            </p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon card-icon-blue">🏥</div>
+                <h4>적용 분야</h4>
+                <p>위장관 천공 봉합, NOTES, ESD/EMR 후 천공 관리, 위벽 결함 폐쇄</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-purple">⚙️</div>
+                <h4>작동 원리</h4>
+                <p>그리퍼로 조직 고정 → 링형 바늘 360° 회전 관통 → 연속 봉합 → 매듭 장치 고정</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-green">📐</div>
+                <h4>설계 철학</h4>
+                <p>내시경 선단에 테이핑 부착, 2채널 와이어 구동, 최소 침습 봉합 구현</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-red">📊</div>
+                <h4>검증 결과</h4>
+                <p>공기 누출 압력 118.5±41.7 mmHg — 수동 봉합(127.4±30.2)과 통계적 유의차 없음 (P=0.812)</p>
+            </div>
+        </div>
+
+        <h3>시스템 아키텍처 흐름</h3>
+        <div class="flow-container">
+            <div class="flow-node">내시경<br>(GIF-Q260)</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">ENDOCRAB<br>Main Body</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">Gripper<br>(조직 포획)</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">Ring Needle<br>(관통)</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">Knotting<br>Device</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">봉합<br>완료</div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 2. COMPONENTS ═══════════════ -->
+    <section class="section section-purple" id="sec-components">
+        <h2>🧩 2. 구성 요소 상세 분석</h2>
+        <p>ENDOCRAB 시스템은 크게 5개의 주요 구성요소로 이루어져 있습니다. 제공된 이미지(Figure 3)와 논문 기술에 따른 상세 분석입니다.</p>
+
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>구성요소</th>
+                    <th>기능</th>
+                    <th>소재</th>
+                    <th>핵심 특징</th>
+                    <th>대응 Figure</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="label">① Grippers (그리퍼)</td>
+                    <td>봉합할 조직을 선택적으로 포획·고정</td>
+                    <td><span class="tag-inline tag-steel">Stainless Steel</span></td>
+                    <td>2개의 <span class="val">6 mm</span> jaw, 와이어 연결 개폐</td>
+                    <td>Fig 3(a)</td>
+                </tr>
+                <tr>
+                    <td class="label">② Ring-Shaped Needle (링형 바늘)</td>
+                    <td>고정된 조직을 360° 회전하며 관통</td>
+                    <td><span class="tag-inline tag-steel">Stainless Steel</span></td>
+                    <td>직경 <span class="val">13 mm</span>, 본체 내부 수납</td>
+                    <td>Fig 3(a)</td>
+                </tr>
+                <tr>
+                    <td class="label">③ Main Body (본체)</td>
+                    <td>그리퍼·바늘 장착 프레임, 내시경 장착부</td>
+                    <td><span class="tag-inline tag-steel">Stainless Steel</span></td>
+                    <td><span class="val">50×15×5.45 mm</span></td>
+                    <td>Fig 3(a,b)</td>
+                </tr>
+                <tr>
+                    <td class="label">④ Handles (핸들, 2개)</td>
+                    <td>바늘 회전 제어 + 그리퍼 개폐 제어</td>
+                    <td>—</td>
+                    <td>별도 와이어로 원격 조작</td>
+                    <td>Fig 3(c)</td>
+                </tr>
+                <tr>
+                    <td class="label">⑤ Knotting Device (매듭 장치)</td>
+                    <td>봉합 완료 후 실 고정·잠금</td>
+                    <td><span class="tag-inline tag-steel">Stainless Steel</span></td>
+                    <td>Male stud + Female ring, 변형 겸자로 조작</td>
+                    <td>Fig 3(d)</td>
+                </tr>
+                <tr>
+                    <td class="label">⑥ 봉합사 (Suture Thread)</td>
+                    <td>조직 봉합용 실</td>
+                    <td><span class="tag-inline tag-nylon">4-0 Nylon</span></td>
+                    <td>52-R-NB4040 (Deknatel Inc.), 비드 고정</td>
+                    <td>—</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ═══════════════ 3. CRITICAL DIMENSIONS ═══════════════ -->
+    <section class="section section-red" id="sec-dimensions">
+        <h2>📏 3. 핵심 치수 스펙 (Critical Dimensions)</h2>
+        <p>논문과 이미지에서 추출한 확인된 치수 정보입니다. Fusion 360에서 모델링 시 기준 치수로 사용합니다.</p>
+
+        <div class="blueprint">
+            <div class="blueprint-title">▸ ENDOCRAB Main Body — Primary Dimensions</div>
+            <div class="dim-row">
+                <span class="dim-label">Main Body 길이 (Length)</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">50.00 mm</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">Main Body 폭 (Width)</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">15.00 mm</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">Main Body 두께 (Thickness)</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">5.45 mm</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">Gripper Jaw 크기 (Each)</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">6.00 mm</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">Ring Needle 직경 (Diameter)</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">13.00 mm</span>
+            </div>
+        </div>
+
+        <div class="blueprint">
+            <div class="blueprint-title">▸ 작업 환경 (Operational Context)</div>
+            <div class="dim-row">
+                <span class="dim-label">목표 천공 크기</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">20.00 mm</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">봉합 횟수 (Protocol)</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">3 stitch / 6 penetrations</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">봉합 간격</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">10.00 mm</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">내시경 모델</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">GIF-Q260 (Olympus)</span>
+            </div>
+            <div class="dim-row">
+                <span class="dim-label">봉합사 규격</span>
+                <span class="dim-arrow">────→</span>
+                <span class="dim-value">4-0 Nylon (Deknatel)</span>
+            </div>
+        </div>
+
+        <div class="highlight-box highlight-warning">
+            <strong>⚠️ 추정 치수 (Estimated from Images)</strong>
+            <p>
+                아래 치수는 논문에 명시되지 않았으나, 이미지 비율 분석(Figure 3b의 자 스케일 참조)과 
+                일반적인 내시경 기기 규격에서 추정한 값입니다. Fusion 360 모델링 시 참고용으로만 사용하세요.
+            </p>
+        </div>
+
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>추정 값</th>
+                    <th>근거</th>
+                    <th>신뢰도</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="label">Main Body + Gripper 전체 길이</td>
+                    <td class="val">~62–65 mm</td>
+                    <td>Fig 3(b) 자 비교 — 그리퍼 포함 시 본체 50mm + 그리퍼 ~12–15mm</td>
+                    <td><span class="badge badge-orange" style="font-size:0.65rem;">중간</span></td>
+                </tr>
+                <tr>
+                    <td class="label">바늘 와이어 게이지</td>
+                    <td class="val">~0.8–1.0 mm</td>
+                    <td>일반 내시경용 링 바늘 규격</td>
+                    <td><span class="badge badge-orange" style="font-size:0.65rem;">낮음</span></td>
+                </tr>
+                <tr>
+                    <td class="label">그리퍼 개방 각도</td>
+                    <td class="val">~60–90°</td>
+                    <td>Fig 4(a) 이미지에서 개방 상태 추정</td>
+                    <td><span class="badge badge-orange" style="font-size:0.65rem;">중간</span></td>
+                </tr>
+                <tr>
+                    <td class="label">Main Body 내부 니들 채널 직경</td>
+                    <td class="val">~14–15 mm</td>
+                    <td>13mm 링 니들 회전을 위한 여유 공간</td>
+                    <td><span class="badge badge-orange" style="font-size:0.65rem;">중간</span></td>
+                </tr>
+                <tr>
+                    <td class="label">내시경 부착용 테이프 위치</td>
+                    <td class="val">본체 후단</td>
+                    <td>Fig 3(b)에서 테이핑 확인</td>
+                    <td><span class="badge badge-green" style="font-size:0.65rem;">높음</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ═══════════════ 4. MAIN BODY ═══════════════ -->
+    <section class="section section-green" id="sec-main-body">
+        <h2>🔧 4. Main Body 설계 분석</h2>
+
+        <div class="two-col">
+            <div>
+                <h3>형상 특징</h3>
+                <p>직사각형 플랫폼 구조의 스테인리스 스틸 본체로, 상면에 링형 바늘의 회전 경로(채널)가 형성되어 있습니다.</p>
+                <ul style="list-style:none; padding:0; margin:1rem 0;">
+                    <li style="padding:0.4rem 0; font-size:0.9rem; color:var(--text-secondary);">▸ 전면(Distal): 그리퍼 장착부 — 2개의 jaw가 힌지 연결</li>
+                    <li style="padding:0.4rem 0; font-size:0.9rem; color:var(--text-secondary);">▸ 중앙: 링 니들 수납 채널 (직경 ~14mm 원형 가이드)</li>
+                    <li style="padding:0.4rem 0; font-size:0.9rem; color:var(--text-secondary);">▸ 후면(Proximal): 내시경 tip 부착부 + 와이어 출입구</li>
+                    <li style="padding:0.4rem 0; font-size:0.9rem; color:var(--text-secondary);">▸ 측면: 와이어 가이드 홈 (2채널)</li>
+                </ul>
+            </div>
+            <div>
+                <h3>소재 사양</h3>
+                <table class="spec-table">
+                    <tbody>
+                        <tr><td class="label">소재</td><td class="val">SUS 304/316L (추정)</td></tr>
+                        <tr><td class="label">표면 처리</td><td>의료기기용 전해 연마 (추정)</td></tr>
+                        <tr><td class="label">제조 방식</td><td>CNC 밀링 + 와이어 방전 가공 (추정)</td></tr>
+                        <tr><td class="label">생체적합성</td><td>ISO 10993 준수 (추정)</td></tr>
+                    </tbody>
+                </table>
+                <div class="highlight-box highlight-info" style="margin-top:1rem;">
+                    <strong>💡 Fusion 360 모델링 팁</strong>
+                    <p>본체는 단순 직육면체에서 시작하여, 중앙에 링 니들용 원형 포켓을 가공하고, 전면에 그리퍼 힌지 홀을 추가하는 방식으로 설계합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 5. GRIPPER ═══════════════ -->
+    <section class="section section-blue" id="sec-gripper">
+        <h2>🦀 5. Gripper 메커니즘 분석</h2>
+        <p>
+            이미지 1 Figure 3(a)에서 명확히 확인되는 그리퍼는 ENDOCRAB의 가장 특징적인 구성요소입니다. 
+            "CRAB(게)"라는 이름의 유래이기도 합니다.
+        </p>
+
+        <div class="two-col">
+            <div>
+                <h3>구조 분석</h3>
+                <table class="spec-table">
+                    <tbody>
+                        <tr><td class="label">Jaw 수</td><td class="val">2개 (좌/우 대칭)</td></tr>
+                        <tr><td class="label">각 Jaw 크기</td><td class="val">6 mm</td></tr>
+                        <tr><td class="label">형태</td><td>집게(Claw) 형상, 원호형 선단</td></tr>
+                        <tr><td class="label">개폐 방식</td><td>와이어 풀(Pull) → 폐쇄 / 이완 → 개방</td></tr>
+                        <tr><td class="label">힌지 위치</td><td>Main Body 전면 상단</td></tr>
+                        <tr><td class="label">포획 깊이</td><td>점막–점막하층 (~2–3mm)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>작동 원리</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <h5>개방 (Open)</h5>
+                            <p>핸들 이완 시 스프링/탄성력에 의해 jaw가 벌어져 링 니들이 노출됨</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <h5>포획 (Grasp)</h5>
+                            <p>핸들의 와이어를 당기면 jaw가 닫히며 봉합 대상 조직을 클램핑</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <h5>고정 유지 (Hold)</h5>
+                            <p>와이어 텐션 유지 → 링 니들 관통 동안 조직 안정적 고정</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <h5>해제 (Release)</h5>
+                            <p>관통 완료 후 핸들 이완으로 jaw 개방, 다음 봉합 위치로 이동</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-box highlight-danger">
+            <strong>🔴 설계 핵심 포인트</strong>
+            <p>
+                그리퍼는 링 니들의 회전 경로와 공간적으로 간섭하지 않아야 합니다. 
+                Jaw가 닫힌 상태에서 니들이 조직을 관통할 때, jaw 끝단은 니들 경로 바깥에 위치해야 합니다.
+                이는 6mm jaw와 13mm 니들 직경의 기하학적 관계에서 자연스럽게 해결됩니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 6. RING NEEDLE ═══════════════ -->
+    <section class="section section-purple" id="sec-needle">
+        <h2>💉 6. Ring-Shaped Needle 분석</h2>
+        <p>
+            ENDOCRAB의 핵심 봉합 요소인 링형 바늘은 완전한 원형(360°) 형태로, 
+            본체 내부의 가이드 채널을 따라 회전하며 그리퍼에 고정된 조직을 관통합니다.
+        </p>
+
+        <div class="two-col">
+            <div>
+                <h3>바늘 사양</h3>
+                <table class="spec-table">
+                    <tbody>
+                        <tr><td class="label">형태</td><td class="val">완전 원형 (Full Ring)</td></tr>
+                        <tr><td class="label">외경</td><td class="val">13.00 mm</td></tr>
+                        <tr><td class="label">소재</td><td>의료용 스테인리스 스틸 (추정 SUS 302/304)</td></tr>
+                        <tr><td class="label">단면</td><td>원형 또는 삼각형 (절삭 포인트용)</td></tr>
+                        <tr><td class="label">봉합사 연결</td><td>아이(Eye) 또는 스웨이지드(Swaged) 방식</td></tr>
+                        <tr><td class="label">구동 방식</td><td>와이어 → 360° 회전</td></tr>
+                        <tr><td class="label">봉합사</td><td>4-0 Nylon, 비드 고정 말단</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>회전 메커니즘</h3>
+                <p style="margin-bottom:0.8rem;">
+                    링형 바늘은 본체 중앙부의 원형 채널(직경 ~14–15mm) 내에서 가이드되며, 
+                    핸들에 연결된 별도의 와이어에 의해 360° 회전합니다.
+                </p>
+                <div class="highlight-box highlight-info">
+                    <strong>💡 핵심 기구학</strong>
+                    <p>
+                        니들 회전 시 팁(point)이 그리퍼 jaw 사이를 통과하며 조직을 관통합니다. 
+                        1회 완전 회전(360°)으로 1회 관통이 완료되며, 봉합사가 조직을 통과한 상태가 됩니다.
+                        이 과정을 6회 반복하여 연속 봉합을 완성합니다.
+                    </p>
+                </div>
+                <div class="highlight-box highlight-success">
+                    <strong>✅ 이미지 1 확인 사항 (Fig 4c)</strong>
+                    <p>
+                        이미지 1의 (c) 패널에서 링 니들이 빨간 원으로 표시되어 회전 관통 중인 상태가 확인됩니다. 
+                        니들의 황금색/금속색 원형이 그리퍼 위치에서 돌출된 것을 볼 수 있습니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 7. KNOTTING DEVICE ═══════════════ -->
+    <section class="section section-green" id="sec-knotting">
+        <h2>🔗 7. Knotting Device (매듭 장치) 분석</h2>
+        
+        <div class="two-col">
+            <div>
+                <h3>구조</h3>
+                <p>이미지 2의 Figure 3(d)에서 확인되는 매듭 장치는 봉합 완료 후 실을 고정하는 잠금 메커니즘입니다.</p>
+                <table class="spec-table">
+                    <tbody>
+                        <tr><td class="label">구성</td><td>Male Stud(수형) + Female Ring(암형)</td></tr>
+                        <tr><td class="label">조작 도구</td><td>변형된 내시경 겸자 (Outer tube 포함)</td></tr>
+                        <tr><td class="label">잠금 방식</td><td>Female ring을 Male stud 끝까지 밀어 압착</td></tr>
+                        <tr><td class="label">실 통과</td><td>Male stud의 경사 구멍(Oblique hole)을 통해</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>작동 순서</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <h5>실 통과</h5>
+                            <p>조직에 부착된 봉합사를 male stud의 경사 구멍에 통과시킴</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <h5>결합</h5>
+                            <p>Male stud를 female ring에 삽입, 변형 겸자로 고정</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <h5>위치 조정</h5>
+                            <p>내시경과 함께 봉합 부위까지 밀어 넣어 적절한 위치에 배치</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <h5>잠금</h5>
+                            <p>Female ring을 male stud 끝까지 밀어 봉합사 고정 → 잔여 실 절단·제거</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-box highlight-info">
+            <strong>📋 특허 정보</strong>
+            <p>
+                ENDOCRAB 및 매듭 장치는 한국 특허로 보호됩니다: 
+                <strong>DP20220544, DP20220545, DP20220603, DP20120310</strong> (Korea)
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 8. HANDLE & WIRE ═══════════════ -->
+    <section class="section section-red" id="sec-handle">
+        <h2>🕹️ 8. Handle & Wire 구동 시스템</h2>
+        <p>이미지 2의 Figure 3(c)에서 확인되는 2개의 핸들 컨트롤러입니다.</p>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon card-icon-orange">🔄</div>
+                <h4>핸들 A — 니들 회전 제어 (좌측)</h4>
+                <p>와이어를 통해 링형 바늘의 360° 회전을 조작합니다. 핸들의 직선 운동이 와이어를 통해 니들의 회전 운동으로 변환됩니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-blue">✊</div>
+                <h4>핸들 B — 그리퍼 개폐 제어 (우측)</h4>
+                <p>와이어를 당기면 그리퍼 jaw가 닫히고, 이완하면 jaw가 열립니다. 핑거 그립 형태의 인체공학적 디자인입니다.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-purple">🔌</div>
+                <h4>와이어 전송 시스템</h4>
+                <p>유연한 아우터 튜브(outer sheath) 내부로 스테인리스 와이어가 이동합니다. 내시경의 곡률을 따라 유연하게 전달됩니다. 보우든 케이블(Bowden cable) 방식 추정.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 9. SURGICAL PROCEDURE ═══════════════ -->
+    <section class="section section-blue" id="sec-procedure">
+        <h2>📋 9. 수술 절차 (Surgical Procedure)</h2>
+        <p>
+            이미지 1의 Figure 4(a–h)에서 확인되는 전체 봉합 절차입니다. 
+            상단 실제 사진과 하단 도해가 각 단계를 보여줍니다.
+        </p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">a</div>
+                <div class="step-content">
+                    <h5>그리퍼 개방 & 타겟팅</h5>
+                    <p>절개 부위에 ENDOCRAB를 위치시키고 그리퍼를 넓게 열어 봉합 대상 조직을 확인합니다. 20mm 절개선의 중심부터 시작합니다.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">b</div>
+                <div class="step-content">
+                    <h5>조직 포획 (Tissue Grasping)</h5>
+                    <p>절개선 한쪽의 위 조직을 그리퍼로 정확히 포획합니다. 점막–점막하층의 적절한 깊이를 확보합니다.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">c</div>
+                <div class="step-content">
+                    <h5>니들 회전 관통 (Needle Rotation & Penetration)</h5>
+                    <p>링형 바늘을 360° 회전시켜 고정된 조직을 관통합니다. 이미지에서 빨간 원으로 니들 위치 표시됨.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">d</div>
+                <div class="step-content">
+                    <h5>그리퍼 해제 & 재위치</h5>
+                    <p>그리퍼를 열고 다음 봉합 부위를 탐색합니다. (a)~(d)를 6회 반복하여 3 스티치 완성.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">e</div>
+                <div class="step-content">
+                    <h5>내시경 인출</h5>
+                    <p>6회 관통 완료 후 내시경을 조심스럽게 빼냅니다. 봉합사가 조직과 ENDOCRAB에 연결된 상태.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">f</div>
+                <div class="step-content">
+                    <h5>봉합사 절단</h5>
+                    <p>조직과 ENDOCRAB 사이의 봉합사를 절단합니다.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">g</div>
+                <div class="step-content">
+                    <h5>매듭 장치 삽입</h5>
+                    <p>조직에 부착된 봉합사를 매듭 장치(male stud)의 경사 구멍에 통과시키고, 내시경으로 봉합 부위까지 밀어 넣습니다.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">h</div>
+                <div class="step-content">
+                    <h5>매듭 고정 & 완료</h5>
+                    <p>Female ring을 male stud에 밀어 넣어 봉합사를 확실히 고정하고, 잔여 봉합사를 절단·제거합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 10. PERFORMANCE ═══════════════ -->
+    <section class="section section-purple" id="sec-performance">
+        <h2>📊 10. 성능 비교 데이터</h2>
+        <p>30마리 돼지 위(각 그룹 10개)를 사용한 ex vivo 실험 결과입니다.</p>
+
+        <h3>공기 누출 압력 (Air Leakage Pressure) — 봉합 강도 지표</h3>
+        <div class="compare-grid">
+            <div class="compare-item">
+                <h4>ENDOCRAB</h4>
+                <div class="big-val">118.5</div>
+                <div class="sub-val">± 41.7 mmHg</div>
+            </div>
+            <div class="compare-item">
+                <h4>Hand Suturing (HS)</h4>
+                <div class="big-val">127.4</div>
+                <div class="sub-val">± 30.2 mmHg</div>
+            </div>
+            <div class="compare-item">
+                <h4>TTSC (Clip)</h4>
+                <div class="big-val">73.6</div>
+                <div class="sub-val">± 21.6 mmHg</div>
+            </div>
+        </div>
+
+        <h3>성능 비교 바 차트</h3>
+        <div class="data-bar-container">
+            <div class="data-bar-item">
+                <div class="data-bar-label">
+                    <span>Hand Suturing (Full-thickness, 대조군)</span>
+                    <span>127.4 mmHg</span>
+                </div>
+                <div class="data-bar-track">
+                    <div class="data-bar-fill fill-purple" style="width: 100%;"></div>
+                </div>
+            </div>
+            <div class="data-bar-item">
+                <div class="data-bar-label">
+                    <span>ENDOCRAB (Mucosal-Submucosal)</span>
+                    <span>118.5 mmHg</span>
+                </div>
+                <div class="data-bar-track">
+                    <div class="data-bar-fill fill-blue" style="width: 93%;"></div>
+                </div>
+            </div>
+            <div class="data-bar-item">
+                <div class="data-bar-label">
+                    <span>TTSC (Mucosal-Submucosal)</span>
+                    <span>73.6 mmHg</span>
+                </div>
+                <div class="data-bar-track">
+                    <div class="data-bar-fill fill-red" style="width: 58%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <h3>통계적 유의성</h3>
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>비교</th>
+                    <th>P-value</th>
+                    <th>결과</th>
+                    <th>해석</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="label">ENDOCRAB vs HS</td>
+                    <td class="val">P = 0.812</td>
+                    <td><span class="badge badge-green" style="font-size:0.7rem;">유의차 없음</span></td>
+                    <td>점막층만 봉합해도 전층 수동 봉합에 준하는 강도</td>
+                </tr>
+                <tr>
+                    <td class="label">ENDOCRAB vs TTSC</td>
+                    <td class="val">P = 0.012</td>
+                    <td><span class="badge badge-red" style="font-size:0.7rem;">유의차 있음</span></td>
+                    <td>ENDOCRAB이 TTSC 대비 유의하게 강함</td>
+                </tr>
+                <tr>
+                    <td class="label">시술 시간 비교</td>
+                    <td class="val">—</td>
+                    <td><span class="badge badge-orange" style="font-size:0.7rem;">HS 최단</span></td>
+                    <td>ENDOCRAB ≈ TTSC (시술 시간 유의차 없음)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ═══════════════ 11. IIT BOMBAY REFERENCE ═══════════════ -->
+    <section class="section section-red" id="sec-iit-ref">
+        <h2>🇮🇳 11. IIT Bombay 참조 디바이스 분석</h2>
+        <p>
+            제공된 이미지 3은 IIT Bombay의 "<strong>An Automated Needle Holder and Suturing Device</strong>" 프로젝트입니다. 
+            ENDOCRAB과 유사한 목적의 자동 봉합 장치로, 핵심 설계 컨셉을 비교 분석합니다.
+        </p>
+
+        <div class="two-col">
+            <div>
+                <h3>IIT Bombay 디바이스 특징</h3>
+                <table class="spec-table">
+                    <tbody>
+                        <tr><td class="label">설계 목적</td><td>일반 수술 + 복강경 수술 겸용 자동 봉합</td></tr>
+                        <tr><td class="label">모듈러 설계</td><td>교환 가능한 니들 홀더 모듈</td></tr>
+                        <tr><td class="label">작동 메커니즘</td><td><span class="val">Two Click Mechanism</span> — 최소 조작</td></tr>
+                        <tr><td class="label">니들 호환성</td><td><strong>기존 봉합 니들</strong> 사용 가능 (전용 니들 불필요)</td></tr>
+                        <tr><td class="label">형태</td><td>권총형 핸들 + 장축 샤프트 + 선단 니들 홀더</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>ENDOCRAB과의 핵심 차이점</h3>
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>ENDOCRAB</th>
+                            <th>IIT Bombay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="label">적용 수술</td>
+                            <td>내시경 (NOTES)</td>
+                            <td>일반 + 복강경</td>
+                        </tr>
+                        <tr>
+                            <td class="label">바늘 타입</td>
+                            <td>전용 링형 바늘</td>
+                            <td>기존 봉합 바늘</td>
+                        </tr>
+                        <tr>
+                            <td class="label">삽입 경로</td>
+                            <td>내시경 채널</td>
+                            <td>트로카/직접 삽입</td>
+                        </tr>
+                        <tr>
+                            <td class="label">봉합 방식</td>
+                            <td>연속 봉합</td>
+                            <td>단속 + 연속 가능</td>
+                        </tr>
+                        <tr>
+                            <td class="label">작동 복잡도</td>
+                            <td>2핸들 + 매듭장치</td>
+                            <td>Two Click (최소)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="highlight-box highlight-success">
+            <strong>✅ IIT Bombay 디바이스의 참조 가치</strong>
+            <p>
+                이미지 3에서 확인되는 "Two Click Mechanism"과 "Modular Needle Holder" 컨셉은 
+                ENDOCRAB의 차기 설계 개선에 참고할 수 있는 핵심 아이디어입니다. 
+                특히 기존 봉합 니들 호환성은 비용과 접근성 측면에서 큰 장점입니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 12. IMAGE ANALYSIS ═══════════════ -->
+    <section class="section section-green" id="sec-image-analysis">
+        <h2>🖼️ 12. 제공 이미지 상세 분석</h2>
+
+        <h3>이미지 1 — 수술 절차 도해 (Figure 4)</h3>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon card-icon-blue">📷</div>
+                <h4>상단 사진 (a–d)</h4>
+                <p>실제 돼지 위 천공 모델에서의 봉합 과정. 20mm 절개, 링 니들(황금색 원형) 확인, 봉합 완료 상태.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-purple">📐</div>
+                <h4>중단 도해 (a–d)</h4>
+                <p>ENDOCRAB 본체의 조감도. 그리퍼 위치, 니들 회전 방향(점선 화살표), 본체 형상 확인.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-red">🔬</div>
+                <h4>하단 도해 (e–h)</h4>
+                <p>봉합 후 매듭 장치 사용 과정. 노란 화살표(f)는 실 당김 방향, 빨간 화살표(g,h)는 매듭 장치 이동 방향.</p>
+            </div>
+        </div>
+
+        <h3>이미지 2 — 디바이스 구성품 (Figure 3)</h3>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon card-icon-orange">🦀</div>
+                <h4>(a) 본체 + 그리퍼 + 링 니들</h4>
+                <p>직사각형 본체 상단에 2개의 그리퍼(claw)와 황금색 링 니들이 장착. "Grippers"와 "Ring shape Needle" 라벨 확인.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-blue">📏</div>
+                <h4>(b) 내시경 부착 외관</h4>
+                <p>내시경 tip에 테이핑으로 고정된 ENDOCRAB. 자(ruler)와 비교 시 전체 길이 ~60mm+ 확인.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-green">🎮</div>
+                <h4>(c) 핸들 컨트롤러</h4>
+                <p>2개의 플라스틱 핸들. 좌측(흰색 고리형): 니들 회전용, 우측(주황색): 그리퍼 개폐용.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-purple">🔗</div>
+                <h4>(d) 매듭 장치</h4>
+                <p>금속 축(male stud) + 외부 튜브. 변형 겸자에 의해 조작. 가느다란 금속 프로브 형태.</p>
+            </div>
+        </div>
+
+        <h3>이미지 3 — IIT Bombay Suture Ring Needle Device</h3>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon card-icon-red">🔫</div>
+                <h4>상단: 전체 외관</h4>
+                <p>권총형 핸들 + 장축 샤프트 + 선단 클램프/니들 홀더. "Modular design for general and laparoscopic surgery" 라벨.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon card-icon-orange">⚙️</div>
+                <h4>하단: 니들 홀더 상세</h4>
+                <p>링형 니들 홀더의 확대 3D 렌더. 금속 클램프가 기존 봉합 니들을 잡는 구조. "Modular needle holder for conventional suturing needle" 라벨.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 13. FUSION 360 MAPPING ═══════════════ -->
+    <section class="section section-blue" id="sec-fusion-mapping">
+        <h2>🎯 13. Fusion 360 모델링 매핑</h2>
+        <p>위 분석을 기반으로 Fusion 360에서 모델링할 때의 파트 분해와 우선순위입니다.</p>
+
+        <h3>모델링 파트 구조 (Assembly Tree)</h3>
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>파트 #</th>
+                    <th>파트명</th>
+                    <th>치수 (확인/추정)</th>
+                    <th>Fusion 360 접근법</th>
+                    <th>우선순위</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="val">P1</td>
+                    <td class="label">Main Body</td>
+                    <td>50 × 15 × 5.45 mm <span class="tag-inline tag-critical">확인</span></td>
+                    <td>직육면체 → 포켓 → 채널 가공</td>
+                    <td><span class="badge badge-red" style="font-size:0.7rem;">최우선</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P2</td>
+                    <td class="label">Gripper Jaw (×2)</td>
+                    <td>6 mm each <span class="tag-inline tag-critical">확인</span></td>
+                    <td>판재 → 곡면 컷 → 힌지 핀홀</td>
+                    <td><span class="badge badge-red" style="font-size:0.7rem;">최우선</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P3</td>
+                    <td class="label">Ring-Shaped Needle</td>
+                    <td>Ø13 mm <span class="tag-inline tag-critical">확인</span></td>
+                    <td>원형 스케치 → 파이프 스윕</td>
+                    <td><span class="badge badge-red" style="font-size:0.7rem;">최우선</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P4</td>
+                    <td class="label">Gripper Hinge Pin</td>
+                    <td>~Ø1.5 mm (추정)</td>
+                    <td>실린더 형상</td>
+                    <td><span class="badge badge-orange" style="font-size:0.7rem;">중간</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P5</td>
+                    <td class="label">Wire Guide Channel</td>
+                    <td>~Ø1 mm × 2채널 (추정)</td>
+                    <td>본체 측면 슬롯</td>
+                    <td><span class="badge badge-orange" style="font-size:0.7rem;">중간</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P6</td>
+                    <td class="label">Knotting Device — Male Stud</td>
+                    <td>~Ø2–3 mm × 10–15 mm (추정)</td>
+                    <td>실린더 + 경사 구멍</td>
+                    <td><span class="badge badge-blue" style="font-size:0.7rem;">선택</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P7</td>
+                    <td class="label">Knotting Device — Female Ring</td>
+                    <td>~Ø3–4 mm 링 (추정)</td>
+                    <td>파이프 형상</td>
+                    <td><span class="badge badge-blue" style="font-size:0.7rem;">선택</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P8</td>
+                    <td class="label">Handle A (Needle)</td>
+                    <td>자유 설계</td>
+                    <td>인체공학적 핸들 형상</td>
+                    <td><span class="badge badge-blue" style="font-size:0.7rem;">선택</span></td>
+                </tr>
+                <tr>
+                    <td class="val">P9</td>
+                    <td class="label">Handle B (Gripper)</td>
+                    <td>자유 설계</td>
+                    <td>인체공학적 핸들 형상</td>
+                    <td><span class="badge badge-blue" style="font-size:0.7rem;">선택</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>모델링 순서 권장</h3>
+        <div class="flow-container">
+            <div class="flow-node" style="border-color:var(--accent);">P1<br>Main Body</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node" style="border-color:var(--accent);">P3<br>Ring Needle</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node" style="border-color:var(--accent);">P2<br>Grippers</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">P4,P5<br>Hinge/Wire</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">P6,P7<br>Knotting</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">P8,P9<br>Handles</div>
+        </div>
+
+        <div class="highlight-box highlight-warning">
+            <strong>⚠️ Fusion 360 모델링 시 주의사항</strong>
+            <p>
+                1) 링 니들은 본체 내부에서 360° 자유 회전해야 하므로, 니들 외경(13mm)과 채널 내경 사이에 <strong>최소 0.5mm 간극</strong>을 확보하세요.<br>
+                2) 그리퍼 jaw의 힌지 위치는 니들 회전 경로와 간섭하지 않도록 배치해야 합니다.<br>
+                3) 전체 어셈블리는 내시경 tip 직경(~10–12mm)에 부착 가능한 크기여야 합니다.<br>
+                4) 확인된 치수(50×15×5.45mm, 6mm jaw, 13mm needle)를 기본 구속조건으로 설정하세요.
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════ 14. REFERENCES ═══════════════ -->
+    <section class="section section-purple" id="sec-references">
+        <h2>📚 14. 참고 문헌</h2>
+
+        <ul class="ref-list">
+            <li>
+                <span class="ref-num">[1]</span>
+                <span>Jeon, H.J., Hwang, H., Lee, D. et al. <em>Application of natural orifice transluminal endoscopic surgery with ENDOCRAB system for stomach perforation model: ex vivo porcine study.</em> Scientific Reports <strong>14</strong>, 7289 (2024). 
+                <a href="https://www.nature.com/articles/s41598-024-56484-6" target="_blank">DOI: 10.1038/s41598-024-56484-6</a></span>
+            </li>
+            <li>
+                <span class="ref-num">[2]</span>
+                <span>Song, Y. et al. <em>A simple novel endoscopic successive suture device: A validation study for closure strength and reproducibility.</em> Endoscopy <strong>45</strong>, 655–660 (2013). — ENDOCRAB 매듭 장치의 원형</span>
+            </li>
+            <li>
+                <span class="ref-num">[3]</span>
+                <span>IIT Bombay R&D. <em>An Automated Needle Holder and Suturing Device.</em> 
+                <a href="https://rnd.iitb.ac.in/an_automated_needle_holder_and_suturing_device" target="_blank">rnd.iitb.ac.in</a> — 이미지 3 참조 디바이스</span>
+            </li>
+            <li>
+                <span class="ref-num">[4]</span>
+                <span>Voermans, R.P. et al. <em>Novel over-the-scope-clip system for gastrotomy closure in NOTES.</em> Endoscopy <strong>41</strong>, 1052–1055 (2009).</span>
+            </li>
+            <li>
+                <span class="ref-num">[5]</span>
+                <span>Maselli, R. et al. <em>Endoscopic suturing for GI applications.</em> Gastrointest. Endosc. <strong>96</strong>, 780–786 (2022). — OverStitch 참조</span>
+            </li>
+            <li>
+                <span class="ref-num">[6]</span>
+                <span>한국 특허: <strong>DP20220544, DP20220545, DP20220603, DP20120310</strong> — ENDOCRAB 및 매듭 장치 관련</span>
+            </li>
+        </ul>
+    </section>
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <footer class="footer">
+        <p>
+            ENDOCRAB 수술 모듈 분석 & 디자인 스펙 문서 v2.0<br>
+            Generated: 2026-08-10 | Purpose: Fusion 360 Pre-Design Reference<br>
+            Based on: Nature Scientific Reports 2024, DOI: 10.1038/s41598-024-56484-6<br>
+            이 문서는 학술 연구 목적으로 작성되었으며, 실제 의료기기 제조에는 별도의 규제 승인이 필요합니다.
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>

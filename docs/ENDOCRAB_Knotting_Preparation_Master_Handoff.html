@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENDOCRAB 기본 뼈대 및 매듭(Knotting) 모듈 개발 마스터 핸드오프</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --primary: #10b981; /* Emerald */
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-color: #334155;
+            --code-bg: #0b1120;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 25px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(to right, #10b981, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        h2 {
+            color: var(--accent);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: var(--text-main);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        p, li {
+            font-size: 1.02rem;
+            color: #cbd5e1;
+        }
+
+        ul, ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: #fff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-completed { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .status-next { background-color: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .status-alert { background-color: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .highlight-box {
+            background-color: rgba(56, 189, 248, 0.08);
+            border-left: 4px solid var(--accent);
+            padding: 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .doc-link {
+            display: block;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-decoration: none;
+            color: #38bdf8;
+            transition: all 0.2s ease;
+        }
+
+        .doc-link:hover {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .doc-link strong {
+            color: #38bdf8;
+            font-size: 1.05rem;
+        }
+
+        .doc-link span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: #38bdf8;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            color: #e2e8f0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #0b1120;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .img-container {
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #000;
+            text-align: center;
+        }
+
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .caption {
+            padding: 10px;
+            background-color: #1e293b;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ENDOCRAB 기본 뼈대 완성 및 매듭(Knotting) 모듈 개발 마스터 핸드오프</h1>
+            <div class="subtitle">문서 작성일: 2026-08-18 | 세션 인계 및 차기 개발 마스터 지침서</div>
+        </header>
+
+        <!-- 1. 프로젝트 맥락 및 사용자 의도 -->
+        <div class="card">
+            <h2>🎯 1. 프로젝트 맥락 및 궁극적 의도 (Intent & Context)</h2>
+            <p><strong>핵심 문제의식:</strong> 현재의 내시경 봉합기(Endocrab)는 조직을 꿰매는(Suturing) 과정 이후, <strong>체내에서 매듭을 묶는(Knotting) 과정이 매우 복잡하고 시간이 오래 걸리는 한계</strong>가 있습니다.</p>
+            <p><strong>프로젝트 궁극적 목표:</strong> 이 복잡한 Knotting 과정을 획기적으로 단순화하는 <strong>"새로운 In-situ Knotting 모듈"을 고안하고 3D CAD로 구현</strong>하는 것입니다.</p>
+            <p><strong>현재까지의 단계 (현 세션 성과):</strong> Knotting 모듈을 얹기 전, 기구의 중심이 되는 <strong>Endocrab 기본 뼈대(그리퍼를 제외한 내시경 부착 사각 헤드 및 곡선 바늘 구동 모듈)를 Fusion 360에서 Top-down 및 As-Built Joint 기반으로 완벽하게 구현 및 기구학 검증 완료</strong>했습니다.</p>
+        </div>
+
+        <!-- 2. 선행 기술 및 메커니즘 심층 조사 분석 -->
+        <div class="card">
+            <h2>📚 2. 선행 기술 및 메커니즘 심층 조사 분석 (Literature & Mechanism Research)</h2>
+            <p>본 프로젝트를 위해 연구 조사된 3대 내시경/복강경 봉합 기구의 기구학적 특성과 상세 문서 인덱스입니다.</p>
+
+            <h3>2.1 핵심 참조 기구 메커니즘 비교</h3>
+            <table>
+                <tr>
+                    <th>구분</th>
+                    <th>1. Endocrab (Nature 2024)</th>
+                    <th>2. Endo360 (Assut Europe)</th>
+                    <th>3. IITB Auto Suture</th>
+                </tr>
+                <tr>
+                    <td><strong>구동 방식</strong></td>
+                    <td>와이어 푸시-풀(Push-Pull) 방식의 장력 전달</td>
+                    <td>내부 드라이브 폴(Drive Pawl) + 랙/기어</td>
+                    <td>2단계 트리거 + 섹터 기어(Sector Element)</td>
+                </tr>
+                <tr>
+                    <td><strong>바늘 궤적</strong></td>
+                    <td>단일 C형 링 바늘이 원형 궤적을 그리며 20mm 절개선 관통</td>
+                    <td>곡선 바늘이 양쪽 조(Jaw) 사이를 연속적으로 회전 통과</td>
+                    <td>호형(Arcuate) 가이드 슬롯을 통해 반대편 조로 바늘 전달</td>
+                </tr>
+                <tr>
+                    <td><strong>매듭(Knotting) 방식</strong></td>
+                    <td><strong>수동 매듭 / 클립 체결 (복잡한 한계점)</strong></td>
+                    <td>수동 기구 매듭 (Wristed 관절 의존)</td>
+                    <td>기본 봉합 전달에 집중 (별도 매듭 기구 필요)</td>
+                </tr>
+                <tr>
+                    <td><strong>핵심 특징</strong></td>
+                    <td>내시경 팁 부착형 초소형 사각 모듈 + 그리퍼 결합</td>
+                    <td>손목 관절 모방 다자유도 아티큘레이션</td>
+                    <td>일반 수술용 곡선 바늘 호환 모듈형 홀더</td>
+                </tr>
+            </table>
+
+            <h3>2.2 프로젝트 내부 상세 연구 문서 라이브러리 (Deep-Dive Documents)</h3>
+            <p>세부적인 역학 분석이나 이전 브레인스토밍 내용이 필요할 때 참조할 수 있는 마크다운 및 HTML 문서 목록입니다:</p>
+
+            <a class="doc-link" href="ENDOCRAB_Surgical_Module_Analysis.html">
+                <strong>📄 ENDOCRAB_Surgical_Module_Analysis.html (70KB)</strong>
+                <span>Endocrab 수술 모듈의 메커니즘, 구조적 배치, 파라메트릭 치수 및 시뮬레이션 심층 분석 리포트</span>
+            </a>
+
+            <a class="doc-link" href="ENDOCRAB_InSitu_Knotting_Module_Design_Spec.md">
+                <strong>📄 ENDOCRAB_InSitu_Knotting_Module_Design_Spec.md</strong>
+                <span>체내 자동 매듭 형성을 위한 In-situ Knotting 메커니즘 구체 설계 명세서</span>
+            </a>
+
+            <a class="doc-link" href="ENDOCRAB_Knotting_Brainstorming_Summary.md">
+                <strong>📄 ENDOCRAB_Knotting_Brainstorming_Summary.md</strong>
+                <span>루프 캐처, 타이잉 기구, 푸셔 등 매듭 간소화를 위한 다양한 기구학적 아이디어 브레인스토밍 요약</span>
+            </a>
+
+            <a class="doc-link" href="ENDOCRAB_Overstitch_Real_Mechanical_Design_Specification.md">
+                <strong>📄 ENDOCRAB_Overstitch_Real_Mechanical_Design_Specification.md</strong>
+                <span>Apollo OverStitch 상용 장비와 Endocrab의 실제 역학 및 부품 구조 정밀 비교</span>
+            </a>
+
+            <a class="doc-link" href="../endocrab_needle_module_analysis.html">
+                <strong>📄 endocrab_needle_module_analysis.html</strong>
+                <span>기본 바늘 구동 모듈의 조인트, 모션 링크 및 치수 정의 마스터 기획서</span>
+            </a>
+
+            <a class="doc-link" href="Endo360.pdf">
+                <strong>📄 Endo360.pdf</strong>
+                <span>Endo360 공식 기구학 매뉴얼 및 드라이브 폴 작동 구조 브로슈어</span>
+            </a>
+        </div>
+
+        <!-- 3. 기구학적 설계 의도 및 구동 원리 -->
+        <div class="card">
+            <h2>⚙️ 3. 기구학적 설계 의도 및 구동 메커니즘 정밀 정의 (Kinematics Rationale)</h2>
+            <div class="img-container">
+                <img src="../output/fusion_viewport.png" alt="Fusion 360 Viewport Render">
+                <div class="caption">▲ Fusion 360 실시간 연동으로 검증된 Endocrab 선단 뼈대 및 와이어 가상 구동계 (반투명 하우징, C형 바늘, 슬라이더 프록시)</div>
+            </div>
+
+            <h3>컴포넌트 구성 및 실제 기구학적 역할:</h3>
+            <ul>
+                <li><code>Main_Body</code> (50 x 30 x 10 mm): 메인 선단 하우징. 전면에 직경 33mm 원형 포켓과 <strong>조직 진입 개구부(Tissue Bite Window)</strong>, 후방에 보울덴 케이블 인입 유로 및 시스 스토퍼(Sheath Stop) 구비. 내부 관찰을 위해 반투명(Opacity 0.75) 처리.</li>
+                <li><code>Needle_Carrier_Assembly</code> (R=15mm, 두께 3mm): C형 곡선 바늘과 캐리어 링의 통합체. <strong>외주면에 와이어 안착 홈(Cable Groove)과 앵커 결속부</strong>를 내장하여 보울덴 케이블의 인장력으로 회전 토크를 발생하는 캡스턴 풀리(Capstan Pulley) 역할 수행. <strong>Z축 회전(Revolute Joint)</strong> 구속.</li>
+                <li><code>Wire_Slider_Block</code> (12 x 7 x 4 mm): <strong>체외 조작 핸들(Proximal Handle)의 핑거 슬라이더 당김 장력을 모사하기 위한 CAD 가상 액추에이터 프록시(Virtual Kinematic Proxy)</strong>. <strong>X축 선형 이동(Slider Joint)</strong> 구속.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>💡 와이어 장력 시뮬레이션 및 체내/체외 인터페이스 (MotionLink):</strong><br>
+                실제 수술 시에는 집도의가 체외 핸들의 슬라이더를 당겨 카테터 내 와이어에 인장력을 전달하고, 체내 선단에서는 바늘 링 외주면에 감긴 와이어가 캡스턴 풀리 원리로 바늘을 회전 관통시킵니다. CAD 상에서는 이를 <code>MotionLink</code>로 모델링하여 <strong>"가상 슬라이더 장력 스트로크(47.12mm) ↔ 바늘 회전 각도(180°)"</strong>를 정밀 동기화하여 검증합니다.
+            </div>
+        </div>
+
+        <!-- 4. 파이프라인 및 스킬 체계 -->
+        <div class="card">
+            <h2>🛠️ 4. 활성화된 개발 파이프라인 & 스킬/플러그인 체계</h2>
+            <table>
+                <tr>
+                    <th>항목</th>
+                    <th>경로 / 설정</th>
+                    <th>기능 및 연동 프로토콜</th>
+                </tr>
+                <tr>
+                    <td><strong>Fusion 360 Add-in</strong></td>
+                    <td><code>src/AntigravityOnDemand/AntigravityOnDemand.py</code></td>
+                    <td>Port 8080 REST 서버. 메인 UI 스레드 <code>CustomEvent</code> 마샬링으로 <code>/execute_code</code>, <code>/inspect</code>(뷰포트 캡처 및 에러 회신) 처리.</td>
+                </tr>
+                <tr>
+                    <td><strong>CAD Automation Skill</strong></td>
+                    <td><code>.gemini/skills/fusion360-cad-automation/SKILL.md</code></td>
+                    <td>API 단위 규칙(cm DB), 읽기 전용 보호, 파라메트릭 스케치 구속, <strong>4대 치명적 API 런타임 에러 방지 규칙(Rule 5~8)</strong> 수록.</td>
+                </tr>
+                <tr>
+                    <td><strong>Top-down Assembly Skill</strong></td>
+                    <td><code>src/skills/fusion360_topdown_assembly/SKILL.md</code></td>
+                    <td>Skeleton First, No Blind Geometry, Self-Repair 루프, As-Built Joint 래핑 규칙 명시.</td>
+                </tr>
+                <tr>
+                    <td><strong>Master Model Script</strong></td>
+                    <td><code>endocrab_model_generator.py</code></td>
+                    <td>100% 에러 없이 실행 검증된 최신 Endocrab 기본 구동 모듈 생성 파이썬 코드.</td>
+                </tr>
+                <tr>
+                    <td><strong>Live Execution Bridge</strong></td>
+                    <td><code>execute_on_fusion.py</code></td>
+                    <td>파이썬 스크립트를 로컬 Fusion 360 서버로 전송하고 실행 상태/이미지를 가져오는 테스터.</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 5. 4대 에러 해결 가이드 (AI 자가 치유) -->
+        <div class="card" style="border-color: rgba(245, 158, 11, 0.4);">
+            <h2>🚨 5. 해결된 4대 치명적 C++ API 런타임 에러 (Troubleshooting Master)</h2>
+            <table>
+                <tr>
+                    <th>발생 에러</th>
+                    <th>원인</th>
+                    <th>정답 코딩 패턴</th>
+                </tr>
+                <tr>
+                    <td><code>RuntimeError: A valid targetBaseFeature is required</code><br><em>(BRepBodies_add)</em></td>
+                    <td>파라메트릭 모드에서 메모리 TemporaryBRep을 직접 주입하려 함.</td>
+                    <td>메모리 BRep 대신 <strong><code>Sketch + ExtrudeFeatures</code></strong> 정석 API 사용.</td>
+                </tr>
+                <tr>
+                    <td><code>AttributeError: 'bool' object has no attribute 'customOrigin'</code></td>
+                    <td><code>setAsRevoluteJointMotion</code>은 Motion 객체가 아닌 <code>bool</code>을 반환함.</td>
+                    <td>반환값에 속성을 할당하지 않고, <strong><code>JointGeometry</code> 생성 시점에 모서리/중심점 전달</strong>.</td>
+                </tr>
+                <tr>
+                    <td><code>RuntimeError: Environment is not supported</code><br><em>(ConstructionPoints_add)</em></td>
+                    <td>파라메트릭 모드에서 스케치 외부 독립 참조점 생성 불가.</td>
+                    <td>별도 점 대신 <strong>실제 3D B-Rep 바디의 모서리(<code>BRepEdge</code>)를 검색</strong>하여 참조.</td>
+                </tr>
+                <tr>
+                    <td><code>TypeError: argument 4 of type 'Ptr&lt;JointGeometry&gt;'</code></td>
+                    <td><code>asBuiltJoints.createInput</code>에 순수 Edge를 넘겨 C++ 포인터 불일치.</td>
+                    <td><strong><code>adsk.fusion.JointGeometry.createByCurve(edge, keyPoint)</code></strong>로 래핑하여 전달.</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 6. 다음 대화 세션 Action Plan -->
+        <div class="card" style="border-color: rgba(56, 189, 248, 0.4);">
+            <h2>🚀 6. 다음 대화 세션 Action Plan (모듈 수정 및 Knotting 모듈 개발)</h2>
+            <ol>
+                <li>
+                    <strong>기본 모듈 디테일 수정:</strong>
+                    <ul>
+                        <li>조직 접촉면 및 바늘 가이드 슬롯의 미세 공차 조정.</li>
+                        <li>봉합사(Suture Thread)가 통과할 안내 홈(Thread Groove/Eyelet) 배치.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>In-situ Knotting (매듭) 모듈 설계 및 통합:</strong>
+                    <ul>
+                        <li>바늘이 조직을 관통한 후 봉합사 루프(Loop)를 낚아채거나 매듭을 밀어넣는 <strong>Knot Pusher / Loop Catcher 기구부</strong>를 <code>Main_Body</code> 상단/측면에 결합.</li>
+                        <li>Endocrab 본체와의 간섭 여부를 Fusion 360 조립 및 Joint 시뮬레이션으로 검증.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>연동 프로토콜 준수:</strong>
+                    <ul>
+                        <li>새로운 모듈 추가 시에도 <code>.gemini/skills/fusion360-cad-automation/SKILL.md</code>의 규칙을 반드시 준수하여 <code>asBuiltJoints</code> 및 <code>motionLinks</code>로 결합할 것.</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+</body>
+</html>

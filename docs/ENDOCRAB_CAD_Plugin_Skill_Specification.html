@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENDOCRAB Fusion 360 AI CAD Automation Skill & Plugin Specification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070b14;
+            --bg-card: rgba(15, 23, 42, 0.85);
+            --bg-card-hover: rgba(26, 38, 66, 0.9);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --border-highlight: rgba(56, 189, 248, 0.5);
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.3);
+            --secondary: #818cf8;
+            --accent: #f43f5e;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #64748b;
+            --code-bg: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 12% 12%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 88% 88%, rgba(129, 140, 248, 0.08) 0%, transparent 45%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Navigation Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 3rem 2rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--success));
+        }
+
+        .badge-group {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 1.1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 50px;
+        }
+
+        .badge-primary {
+            color: var(--primary);
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        .badge-skill {
+            color: #34d399;
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.35);
+        }
+
+        .badge-roadmap {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 980px;
+            margin: 0 auto 1.75rem auto;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.25rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item strong {
+            color: var(--text-muted);
+        }
+
+        /* Section Cards & Grids */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover {
+            border-color: var(--border-highlight);
+            box-shadow: 0 20px 40px rgba(56, 189, 248, 0.12);
+        }
+
+        .card-full {
+            grid-column: 1 / -1;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.3rem;
+            background: var(--primary);
+            border-radius: 2px;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 1.5rem 0 0.85rem 0;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-size: 0.98rem;
+        }
+
+        /* Analysis Box */
+        .analysis-box {
+            background: rgba(11, 19, 36, 0.8);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 14px 14px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .solution-box {
+            background: rgba(11, 19, 36, 0.8);
+            border-left: 4px solid var(--success);
+            border-radius: 0 14px 14px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .box-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-box .box-title { color: var(--accent); }
+        .solution-box .box-title { color: var(--success); }
+
+        /* Tables & Lists */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.25rem 0;
+            font-size: 0.92rem;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(30, 41, 59, 0.85);
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            text-align: left;
+            padding: 0.95rem 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 0.85rem 1.1rem;
+            color: var(--text-main);
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        .highlight-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--success);
+            background: rgba(52, 211, 153, 0.12);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.5rem;
+            color: #cbd5e1;
+            font-size: 0.88rem;
+            line-height: 1.65;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2.5rem;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="badge-group">
+                <span class="badge badge-primary">Antigravity AI Plugin Architecture</span>
+                <span class="badge badge-skill">Fusion 360 CAD Automation Skill</span>
+                <span class="badge badge-roadmap">Skill/Plugin Roadmap</span>
+            </div>
+            <h1>ENDOCRAB & Fusion 360 AI CAD Skill/Plugin Specification</h1>
+            <p class="subtitle">
+                Fusion 360 파라메트릭 3D CAD 모델링의 표현력 한계 분석, 실시간 뷰포트 미갱신 원인 및 다음 대화용 custom Antigravity Skill / Plugin 개발 명세서
+            </p>
+            <div class="meta-info">
+                <div class="meta-item">Document Purpose: <strong>Skill/Plugin Creation Reference</strong></div>
+                <div class="meta-item">Target Plugin Name: <strong>fusion360-cad-automation</strong></div>
+                <div class="meta-item">Architecture Pattern: <strong>CadQuery STEP + Master Template fx + Local REST Sync</strong></div>
+            </div>
+        </header>
+
+        <!-- SECTION 1: Root Cause Analysis -->
+        <div class="card card-full">
+            <h2>1. 근본 원인 종합 분석 (Root Cause Analysis)</h2>
+            <p>
+                실제 수술용 오토 수처링 디바이스(Image 1: IIT Bombay 2-Click Pistol-Grip, Image 2/3: Nature Sci Rep 2024 ENDOCRAB)와 Fusion 360 자동 생성 결과물 간의 모델링 표현력 및 화면 미갱신 문제에 대한 근본 원인을 3가지 축으로 정밀 진단했습니다.
+            </p>
+
+            <div class="grid" style="margin-top: 1.5rem;">
+                <div class="analysis-box">
+                    <div class="box-title">원인 1: Direct Fusion API의 CSG vs B-Rep Topology 인덱스 취약성</div>
+                    <p style="font-size: 0.92rem;">
+                        순수 파이썬 코드로 Fusion 360 API를 직접 호출할 때, 90도 직육면체 압출(`addTwoPointRectangle` + `extrudeFeatures`)은 10줄 내외로 안정적 빌드되지만, 수술 장비의 **유선형 곡면(Organic Loft)**, **3D 스플라인 궤적(Sweep)**, **모서리 라운딩(Fillet)**을 작성할 경우 B-Rep 엣지 인덱스(`body.edges.item(n)`) 지정 오류나 C++ 런타임 예외가 발생합니다. 이 때문에 스크립트가 밋밋한 박스 형태로 둔화되어 생성되었습니다.
+                    </p>
+                </div>
+
+                <div class="analysis-box">
+                    <div class="box-title">원인 2: Fusion 360 Compute Graph & Active Document Isolation (화면 미갱신)</div>
+                    <p style="font-size: 0.92rem;">
+                        외부에서 파이썬 코드 및 파라메터를 수정하더라도, Fusion 360 프로그램 내부 메모리(`sys.modules`) 및 active document 캔버스는 외부 스크립트 실행 후 사용자가 스크립트 메뉴에서 `Run`을 직접 다시 누르거나 `activeViewport.refresh()` 이벤트를 호출받기 전까지는 이전 화면 상태를 그대로 보존(Freeze)합니다.
+                    </p>
+                </div>
+
+                <div class="analysis-box" style="grid-column: 1 / -1;">
+                    <div class="box-title">원인 3: LLM 코드 생성과 전문 CAD 설계 생태계 간의 패러다임 갭</div>
+                    <p style="font-size: 0.92rem;">
+                        전문 CAD 엔지니어링 현장에서는 파이썬 코드로 3D 부품을 처음부터 끝까지 수천 줄의 API 코드로 그리지 않습니다. **Master Template (`fx`) 파라메트릭 드라이브** 또는 **CadQuery / OpenCASCADE 파이썬 정밀 CAD 엔진 기반 `.step` 파일 내보내기** 표준 방식을 결합하여 사용해야만 실물 렌더링 퀄리티와 100% 동일한 3D 모델을 얻을 수 있습니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: Skill & Plugin Architecture for Next Conversation -->
+        <div class="card card-full">
+            <h2>2. 다음 대화용 플러그인/스킬 아키텍처 설계 (Skill & Plugin Architecture)</h2>
+            <p>
+                다음 대화에서 AntigravityCustomization 시스템에 등록할 **`fusion360-cad-automation`** 스킬 및 플러그인의 표준 파일 구조 및 역할 명세입니다.
+            </p>
+
+            <div class="code-block">
+.gemini/config/plugins/fusion360-cad-automation/
+├── plugin.json                                 # 플러그인 메타데이터 및 스킬 등록 설정
+└── skills/
+    └── fusion360-cad-automation/
+        ├── SKILL.md                            # 스킬 메인 시스템 프롬프트 및 가이드라인
+        ├── scripts/
+        │   ├── cadquery_step_generator.py      # CadQuery/OpenCASCADE 기반 정밀 .step CAD 생성 스크립트
+        │   ├── fusion_master_template_driver.py# Fusion 360 Master Template fx 변수 자동 제어기
+        │   └── fusion_rest_listener.py         # Fusion 360 실시간 뷰포트 캡처/핫리로드 REST 서버
+        ├── resources/
+        │   ├── templates/                      # Master CAD Template (.f3d / .step)
+        │   │   ├── ENDOCRAB_360_Ring_Needle.step
+        │   │   ├── Dual_Serrated_Grippers.step
+        │   │   └── Ergonomic_Pistol_Grip_Handle.step
+        │   └── parameters_schema.json          # 파라메트릭 fx 변수 스키마 정의
+        └── references/
+            └── fusion360_api_cheat_sheet.md    # Fusion 360 API 주요 예제 모음
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>컴포넌트 (Component)</th>
+                        <th>역할 및 기술 표준 (Role & Tech Standard)</th>
+                        <th>해결하는 기존 문제점 (Resolved Issue)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SKILL.md</strong></td>
+                        <td>CAD 모델링 요청 시 LLM의 할루시네이션을 방지하고 정밀 3D 스크립트 템플릿을 호출하는 프롬프트 규칙.</td>
+                        <td>단순 직육면체 코드 출력 방지 및 4단계 정밀 구현 프로토콜 강제.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>cadquery_step_generator.py</strong></td>
+                        <td>Python OpenCASCADE 3D CAD 엔진을 통해 인볼루트 기어 이빨, 톱니 집게, 유선형 로프트를 지닌 `.step` 파일 자동 생성.</td>
+                        <td>Fusion API 스케치 구속조건 C++ 런타임 오류 및 B-Rep 모서리 인덱스 손실 완벽 해결.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fusion_rest_listener.py</strong></td>
+                        <td>Fusion 360 내부에서 상주하는 REST HTTP 서버 (Port 8080). `/inspect`, `/build`, `/modify` 핸들러 제공.</td>
+                        <td>외부 코드 변경 시 Fusion 360 화면이 자동 갱신되지 않는 캔버스 고정 현상 해결.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Master Template `.f3d`</strong></td>
+                        <td>미리 손으로 잘 그어진 Master CAD 파일의 `userParameters` (`fx`) 변수표를 스크립트로 0.1초 만에 갱신.</td>
+                        <td>100% 실물 수술 장비 렌더링 퀄리티 보장.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 3: 4-Stage Engineering Protocol -->
+        <div class="card card-full">
+            <h2>3. 스킬/플러그인 4단계 실행 프로토콜 (4-Stage Protocol)</h2>
+
+            <div class="solution-box">
+                <div class="box-title">Stage 1: REST Listener 기반 헤드리스 뷰포트 실시간 핫리로드</div>
+                <p style="font-size: 0.92rem;">
+                    Fusion 360 내부 Add-In 스레드에서 REST 서버를 띄워, LLM이 파이썬 코드를 수정하는 즉시 메인 스레드에 커스텀 이벤트를 발생시켜 `activeViewport.refresh()` 및 `viewport.png` 캡처를 동적으로 실행합니다.
+                </p>
+            </div>
+
+            <div class="solution-box">
+                <div class="box-title">Stage 2: CadQuery / OpenCASCADE 정밀 STEP 파이프라인</div>
+                <p style="font-size: 0.92rem;">
+                    기어 치형(M0.3 Z12) 및 톱니 집게 4-Notch 곡면을 파이썬 `cadquery` 라이브러리로 표현하여 `.step` 파일로 내보낸 후, Fusion 360에 `importManager.importToTarget()`으로 결합합니다.
+                </p>
+            </div>
+
+            <div class="solution-box">
+                <div class="box-title">Stage 3: Master Template `fx` 변수 실시간 바인딩</div>
+                <p style="font-size: 0.92rem;">
+                    19개 파라메트릭 변수(`Body_Length`, `Needle_Outer_Dia`, `Track_Clearance` 등)를 JSON 스키마로 검증하고 `userParameters.itemByName(key).expression`을 통해 0.1초 만에 형상을 재계산합니다.
+                </p>
+            </div>
+
+            <div class="solution-box">
+                <div class="box-title">Stage 4: LLM Prompt-to-CAD 제어 및 검수</div>
+                <p style="font-size: 0.92rem;">
+                    스킬 내 정의된 검수 프로토콜을 통해 스크립트 빌드 후 `/inspect`를 호출하여 캔버스 스크린샷(`viewport.png`)을 직접 읽어 시각적 결함을 2차 검수합니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- SECTION 4: Draft SKILL.md Code Example for Next Session -->
+        <div class="card card-full">
+            <h2>4. 다음 대화에서 생성할 `SKILL.md` 작성 템플릿 초안</h2>
+            <p>다음 세션에서 사용자 요청 한 번으로 자동 패키징할 `SKILL.md` 표준 마크다운 초안입니다.</p>
+
+            <div class="code-block">
+---
+name: fusion360-cad-automation
+description: "Autodesk Fusion 360 파라메트릭 3D CAD 모델 생성, CadQuery STEP 파일 변환, fx 변수 제어 및 실시간 뷰포트 동기화 스킬"
+---
+
+# Fusion 360 AI CAD Automation Skill
+
+## 사용 지침 (Instructions)
+사용자가 Fusion 360 CAD 모델 생성, 수술용 장비 설계, 파라메트릭 3D 모델링을 요청하면 본 스킬을 적용합니다.
+
+### 실행 프로토콜
+1. **CadQuery STEP 파일 파이프라인**: 
+   곡면 로프트, 정밀 기어 치형, 톱니 집게가 필요한 경우 `scripts/cadquery_step_generator.py`를 실행하여 `.step` 파일로 내보낸 후 Fusion 360에 임포트합니다.
+2. **Master Template `fx` 변수 제어**:
+   `resources/templates/` 내 파라메트릭 `.f3d` 템플릿을 로드하고 19개 `userParameters` 변수를 실시간 바인딩합니다.
+3. **REST 뷰포트 동기화**:
+   `http://localhost:8080/inspect`를 호출하여 Fusion 360 캔버스 스크린샷(`viewport.png`)을 추출하고 검수합니다.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>ENDOCRAB & Fusion 360 AI CAD Skill/Plugin Specification • Prepared for Next Session Custom Skill Packaging</p>
+        </footer>
+    </div>
+</body>
+</html>

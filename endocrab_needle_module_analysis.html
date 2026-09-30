@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endocrab 와이어 구동 기반 바늘 모듈 완벽 설계 기획서</title>
+    <style>
+        :root {
+            --primary-color: #059669; /* Emerald */
+            --secondary-color: #ecfdf5;
+            --text-color: #1e293b;
+            --heading-color: #0f172a;
+            --border-color: #cbd5e1;
+            --alert-bg: #fef2f2;
+            --alert-border: #ef4444;
+            --info-bg: #eff6ff;
+            --info-border: #3b82f6;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --success-bg: #f0fdf4;
+            --success-border: #22c55e;
+        }
+        body { font-family: 'Pretendard', -apple-system, sans-serif; line-height: 1.7; color: var(--text-color); background-color: #f1f5f9; padding: 40px 20px; margin: 0; }
+        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 50px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        h1 { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 40px; font-size: 2.2em; }
+        h2 { color: var(--heading-color); margin-top: 50px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; font-size: 1.6em; }
+        h3 { color: var(--primary-color); margin-top: 35px; font-size: 1.3em; }
+        p, li { font-size: 1.05em; }
+        ul, ol { margin-bottom: 25px; padding-left: 28px; }
+        li { margin-bottom: 12px; }
+        .card { background-color: var(--secondary-color); border-radius: 8px; padding: 25px; margin-bottom: 30px; border-left: 5px solid var(--primary-color); }
+        .alert { background-color: var(--alert-bg); border-left: 5px solid var(--alert-border); padding: 20px; border-radius: 6px; margin: 25px 0; }
+        .info { background-color: var(--info-bg); border-left: 5px solid var(--info-border); padding: 20px; border-radius: 6px; margin: 25px 0; }
+        .success { background-color: var(--success-bg); border-left: 5px solid var(--success-border); padding: 20px; border-radius: 6px; margin: 25px 0; }
+        code { background-color: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.9em; color: #b91c1c; }
+        pre { background-color: var(--code-bg); color: var(--code-text); padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Consolas', monospace; font-size: 0.92em; line-height: 1.5; }
+        .badge { display: inline-block; padding: 4px 10px; font-size: 0.85em; font-weight: bold; border-radius: 12px; background: var(--primary-color); color: white; margin-bottom: 10px; }
+        .badge-error { background: #ef4444; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; vertical-align: top; }
+        th { background-color: #f8fafc; font-weight: bold; }
+        footer { margin-top: 70px; text-align: center; font-size: 0.95em; color: #64748b; border-top: 1px solid var(--border-color); padding-top: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Endocrab 와이어 구동 기반 바늘 모듈 완벽 설계 기획서</h1>
+    
+    <div class="alert">
+        <strong>⚠️ AI 에이전트 주의사항 (Context for New Sessions)</strong><br>
+        이 문서는 대화 맥락이 초기화된 새로운 AI 세션에서도 즉시 <strong>Endocrab 곡선 바늘 구동부(Needle Module)</strong>의 3D 모델링 코드를 완벽하게 작성할 수 있도록 <strong>모든 수치, 조인트(Joint) 역학, 파이썬 API 로직, 그리고 발생했던 실제 에러에 대한 자가 치유(Troubleshooting) 솔루션</strong>을 집대성한 마스터 지침서입니다. 기어(Rack/Pinion) 방식이 아닌 <strong>실제 장비와 동일한 '와이어 장력(Wire Tension) 풀링' 기반의 기구학</strong>을 Fusion 360 Joint 시스템 내에서 수학적으로 매핑하여 구현합니다.
+    </div>
+
+    <div class="card">
+        <h3>1. 핵심 설계 사상 및 매개변수 (Parametric Design Dimensions)</h3>
+        <p>설계의 일관성을 위해 임의 지정된 초기 기준 스케일입니다. 추후 파라미터(UserParameters)를 통해 변경 가능하도록 코딩해야 합니다.</p>
+        <ul>
+            <li><strong>곡선 바늘 반지름 (Needle Radius, <code>R</code>):</strong> 15 mm (외경 30 mm, 내경 26 mm, 두께 3 mm)</li>
+            <li><strong>메인 바디 규격 (Main Body Size):</strong> 길이(L) 50 mm, 폭(W) 30 mm, 두께(T) 10 mm</li>
+            <li><strong>와이어 슬라이더 블록 (Slider Size):</strong> 길이 12 mm, 폭 7 mm, 두께 4 mm, 핀 높이 3 mm</li>
+            <li><strong>와이어 구동부 스트로크 (Slider Stroke):</strong> 약 47.12 mm (반지름 15mm 링의 반원(180도) 호의 길이인 <code>π * 15</code>에 해당)</li>
+        </ul>
+        <p><em>* 기구학 핵심 (Linear-to-Rotary by Wire):</em> 와이어를 1mm 당길 때, 곡선 바늘 캐리어는 와이어가 감기는 풀리의 원둘레에 반비례하여 회전합니다. (즉, <code>1mm 이동 = 360 / (2 * π * 15) ≈ 3.82도 회전</code>)</p>
+    </div>
+
+    <h2>2. 부품 구성 및 형상 정의 (Top-down Assembly Components)</h2>
+    <p>모델링 검증의 안정성을 위해 바늘과 캐리어 링은 하나로 묶어(통합) 설계합니다. 모든 부품은 절대 좌표로 배치 후 Joint로 구속됩니다.</p>
+    
+    <table>
+        <tr>
+            <th>컴포넌트 명 (Component)</th>
+            <th>역할 및 모델링 형상 (Geometry)</th>
+        </tr>
+        <tr>
+            <td><code>Main_Body</code></td>
+            <td>베이스 하우징. 중앙/전면에 바늘 캐리어가 안착할 <strong>지름 33mm의 원형 슬롯 및 전방 윈도우</strong>와, 후방으로 와이어 슬라이더가 움직일 <strong>직선 가이드 채널(폭 8mm)</strong>을 컷(Extrude Cut)하여 생성. 내부 관찰을 위해 반투명(Opacity=0.75) 처리.</td>
+        </tr>
+        <tr>
+            <td><code>Needle_Carrier_Assembly</code></td>
+            <td><strong>곡선 바늘 + 와이어 캐리어 링 통합본.</strong> 중심(X=10, Y=0) 기준 외경 30mm, 내경 26mm, 두께 3mm 링 형상. <strong>전방 90도 개구부 컷 및 선단 샤프닝(뾰족한 끝단)</strong> 처리.</td>
+        </tr>
+        <tr>
+            <td><code>Wire_Slider_Block</code></td>
+            <td>메인 바디 직선 채널 내부에 위치하는 직육면체 블록(12 x 7 x 4 mm) 및 상단 와이어 결속 핀(지름 3mm). <strong>와이어를 당기는 액추에이터의 끝단(Proximal End)</strong>을 시각화한 형태.</td>
+        </tr>
+    </table>
+
+    <h2>3. ⚙️ Fusion 360 파이썬 API 기구학 구현 로직 (Joints & Motion Link)</h2>
+    <div class="info">
+        <strong>Step 1. 컴포넌트 생성 및 B-Rep 스케치 기반 Extrude</strong>
+        <ul>
+            <li><code>Main_Body</code>: 50x30x10mm 베이스 생성 후 원형 포켓(Z=2~8mm) 및 슬라이더 채널(Z=2.5~7.5mm) 컷팅.</li>
+            <li><code>Needle_Carrier_Assembly</code>: Z=3.5~6.5mm 높이에 안착되도록 오프셋 Extrude 후 90도 개구부 및 샤프닝 컷.</li>
+            <li><code>Wire_Slider_Block</code>: Z=3~7mm 채널 내부에 직육면체 생성 및 상단 결속 핀 Join Extrude.</li>
+        </ul>
+
+        <strong>Step 2. As-Built Joint 구속 (Top-Down 원칙)</strong>
+        <ul>
+            <li><strong>Rigid Joint:</strong> <code>main_occ.isGrounded = True</code> (메인 바디 공간 고정).</li>
+            <li><strong>Revolute Joint:</strong> 바늘 바디의 실제 원형 모서리(Circular Edge)를 <code>JointGeometry.createByCurve(edge, CenterKeyPoint)</code>로 래핑하여 Z축 회전 구속 (이름: <code>Needle_Rotation_Joint</code>).</li>
+            <li><strong>Slider Joint:</strong> 슬라이더 바디의 X축 평행 선형 모서리(Linear Edge)를 <code>JointGeometry.createByCurve(edge, MiddleKeyPoint)</code>로 래핑하여 X축 선형 이동 구속 (이름: <code>Wire_Slider_Joint</code>).</li>
+        </ul>
+
+        <strong>Step 3. 와이어 장력 시뮬레이션 (Motion Link)</strong>
+        <ul>
+            <li><code>motion_links.createInput(slider_joint, rev_joint)</code> 활용.</li>
+            <li><code>ml_input.distance = mm(math.pi * 15.0)</code> (4.712 cm)</li>
+            <li><code>ml_input.angle = math.pi</code> (180도 회전)</li>
+            <li><em>효과: 슬라이더 블록을 수동으로 드래그하면, 실제 와이어가 당겨지는 물리법칙과 정확히 동일하게 바늘 캐리어가 원형 궤적을 그리며 꿰매기 모션을 취함.</em></li>
+        </ul>
+    </div>
+
+    <h2>4. 🚨 Fusion 360 AI 자동 코딩 4대 치명적 함정 및 해결 가이드 (Troubleshooting)</h2>
+    <p>AI 에이전트가 코드를 작성할 때 가장 흔히 겪는 4가지 런타임 에러와 그에 대한 완벽한 정답 패턴입니다.</p>
+
+    <table>
+        <tr>
+            <th>에러 Traceback</th>
+            <th>발생 원인</th>
+            <th>❌ 잘못된 코드 vs ✅ 올바른 정답 코드</th>
+        </tr>
+        <tr>
+            <td>
+                <span class="badge badge-error">Error 1</span><br>
+                <code>RuntimeError: 3 : A valid targetBaseFeature is required</code><br>
+                <em>(at BRepBodies_add)</em>
+            </td>
+            <td>파라메트릭(타임라인 활성) 모드에서 <code>TemporaryBRepManager</code>로 만든 메모리 바디를 <code>comp.bRepBodies.add()</code>로 직접 추가하려 할 때 발생.</td>
+            <td>
+                ❌ <code>comp.bRepBodies.add(tmp_box)</code><br><br>
+                ✅ <strong>Sketch + ExtrudeFeatures 사용</strong><br>
+                <code>sk = comp.sketches.add(comp.xYConstructionPlane)</code><br>
+                <code>ext = comp.features.extrudeFeatures.add(...)</code>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="badge badge-error">Error 2</span><br>
+                <code>AttributeError: 'bool' object has no attribute 'customOrigin'</code>
+            </td>
+            <td><code>jointInput.setAsRevoluteJointMotion(...)</code> 메서드는 Motion 객체가 아닌 성공 여부(<code>bool</code>)를 반환하므로 속성을 할당할 수 없음.</td>
+            <td>
+                ❌ <code>mot = rev_in.setAsRevoluteJointMotion(...)</code><br>
+                <code>mot.customOrigin = pt</code><br><br>
+                ✅ <strong>JointGeometry를 생성 시점에 넘김</strong><br>
+                <code>rev_in = as_built_joints.createInput(occ1, occ2, geo)</code><br>
+                <code>rev_in.setAsRevoluteJointMotion(adsk.fusion.JointDirections.ZAxisJointDirection)</code>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="badge badge-error">Error 3</span><br>
+                <code>RuntimeError: 3 : Environment is not supported</code><br>
+                <em>(at ConstructionPoints_add)</em>
+            </td>
+            <td>파라메트릭 모드에서 스케치 외부에서 <code>comp.constructionPoints.add()</code>를 호출할 때 환경 미지원 에러 발생.</td>
+            <td>
+                ❌ <code>comp.constructionPoints.add(pt_in)</code><br><br>
+                ✅ <strong>실제 B-Rep Body의 Edge(모서리)를 검색하여 사용</strong><br>
+                <code>for edge in body.edges:</code><br>
+                <code>&nbsp;&nbsp;if edge.geometry.curveType == Circle3DCurveType:</code>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="badge badge-error">Error 4</span><br>
+                <code>TypeError: in method 'AsBuiltJoints_createInput', argument 4 of type 'Ptr&lt;JointGeometry&gt;'</code>
+            </td>
+            <td><code>asBuiltJoints.createInput</code>에 순수 <code>BRepEdge</code>나 <code>Point3D</code>를 바로 넘기면 C++ 타입 불일치 에러 발생.</td>
+            <td>
+                ❌ <code>as_built_joints.createInput(occ1, occ2, edge)</code><br><br>
+                ✅ <strong>JointGeometry 래퍼 클래스로 감싸서 전달</strong><br>
+                <code>geo = adsk.fusion.JointGeometry.createByCurve(edge, adsk.fusion.JointKeyPointTypes.CenterKeyPoint)</code><br>
+                <code>as_built_joints.createInput(occ1, occ2, geo)</code>
+            </td>
+        </tr>
+    </table>
+
+    <h2>5. ✅ 최종 검증된 완전체 파이썬 API 마스터 코드</h2>
+    <div class="success">
+        <strong>검증 완료:</strong> 아래 코드는 Fusion 360 로컬 서버에서 3개 Occurrence 생성, As-Built Joints 구속, 와이어 MotionLink 동기화, 반투명 재질 처리까지 100% 에러 없이 실행 검증되었습니다.
+    </div>
+
+    <pre><code>import adsk.core, adsk.fusion, traceback, math
+
+def mm(val):
+    return val / 10.0
+
+def run(context):
+    try:
+        app = adsk.core.Application.get()
+        design = adsk.fusion.Design.cast(app.activeProduct)
+        if not design: return
+        root_comp = design.rootComponent
+
+        # Clean existing occurrences for idempotent rebuild
+        for occ in list(root_comp.occurrences):
+            if occ.name.startswith("Main_Body") or occ.name.startswith("Needle_Carrier") or occ.name.startswith("Wire_Slider"):
+                occ.deleteMe()
+
+        # 1. Main Housing (Main_Body: 50x30x10mm)
+        main_occ = root_comp.occurrences.addNewComponent(adsk.core.Matrix3D.create())
+        main_comp = main_occ.component
+        main_comp.name = "Main_Body"
+
+        sk_body = main_comp.sketches.add(main_comp.xYConstructionPlane)
+        sk_body.sketchCurves.sketchLines.addTwoPointRectangle(
+            adsk.core.Point3D.create(mm(-25.0), mm(-15.0), 0), adsk.core.Point3D.create(mm(25.0), mm(15.0), 0))
+        ext_in = main_comp.features.extrudeFeatures.createInput(
+            sk_body.profiles.item(0), adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
+        ext_in.setDistanceExtent(False, adsk.core.ValueInput.createByString("10 mm"))
+        main_comp.features.extrudeFeatures.add(ext_in)
+
+        # 1.1 Needle Pocket Cut (R=16.5mm at X=10, Y=0, Z=2~8mm)
+        sk_pocket = main_comp.sketches.add(main_comp.xYConstructionPlane)
+        sk_pocket.sketchCurves.sketchCircles.addByCenterRadius(adsk.core.Point3D.create(mm(10.0), mm(0.0), 0), mm(16.5))
+        sk_pocket.sketchCurves.sketchLines.addTwoPointRectangle(
+            adsk.core.Point3D.create(mm(10.0), mm(-12.0), 0), adsk.core.Point3D.create(mm(26.0), mm(12.0), 0))
+        p_col = adsk.core.ObjectCollection.create()
+        for i in range(sk_pocket.profiles.count): p_col.add(sk_pocket.profiles.item(i))
+        p_in = main_comp.features.extrudeFeatures.createInput(p_col, adsk.fusion.FeatureOperations.CutFeatureOperation)
+        p_in.setDistanceExtent(False, adsk.core.ValueInput.createByString("6 mm"))
+        p_in.startExtent = adsk.fusion.OffsetStartDefinition.create(adsk.core.ValueInput.createByString("2 mm"))
+        main_comp.features.extrudeFeatures.add(p_in)
+
+        # 1.2 Slider Channel Cut (Width 8mm, X=-26 to 6, Z=2.5~7.5mm)
+        sk_ch = main_comp.sketches.add(main_comp.xYConstructionPlane)
+        sk_ch.sketchCurves.sketchLines.addTwoPointRectangle(
+            adsk.core.Point3D.create(mm(-26.0), mm(-4.0), 0), adsk.core.Point3D.create(mm(6.0), mm(4.0), 0))
+        c_col = adsk.core.ObjectCollection.create()
+        for i in range(sk_ch.profiles.count): c_col.add(sk_ch.profiles.item(i))
+        c_in = main_comp.features.extrudeFeatures.createInput(c_col, adsk.fusion.FeatureOperations.CutFeatureOperation)
+        c_in.setDistanceExtent(False, adsk.core.ValueInput.createByString("5 mm"))
+        c_in.startExtent = adsk.fusion.OffsetStartDefinition.create(adsk.core.ValueInput.createByString("2.5 mm"))
+        main_comp.features.extrudeFeatures.add(c_in)
+
+        # 2. Needle Carrier Assembly (R=15mm, r=13mm, T=3mm at Z=3.5~6.5mm)
+        needle_occ = root_comp.occurrences.addNewComponent(adsk.core.Matrix3D.create())
+        needle_comp = needle_occ.component
+        needle_comp.name = "Needle_Carrier_Assembly"
+        xc_needle, yc_needle = mm(10.0), mm(0.0)
+
+        sk_n = needle_comp.sketches.add(needle_comp.xYConstructionPlane)
+        sk_n.sketchCurves.sketchCircles.addByCenterRadius(adsk.core.Point3D.create(xc_needle, yc_needle, 0), mm(15.0))
+        sk_n.sketchCurves.sketchCircles.addByCenterRadius(adsk.core.Point3D.create(xc_needle, yc_needle, 0), mm(13.0))
+        
+        needle_body = None
+        for prof in sk_n.profiles:
+            if prof.profileLoops.count > 1:
+                ext_n = needle_comp.features.extrudeFeatures.createInput(prof, adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
+                ext_n.setDistanceExtent(False, adsk.core.ValueInput.createByString("3 mm"))
+                ext_n.startExtent = adsk.fusion.OffsetStartDefinition.create(adsk.core.ValueInput.createByString("3.5 mm"))
+                base_ext = needle_comp.features.extrudeFeatures.add(ext_n)
+                if base_ext.bodies.count > 0: needle_body = base_ext.bodies.item(0)
+                break
+
+        # 2.1 C-Shape 90 deg Cut & Tip Sharpening
+        if needle_body:
+            sk_c = needle_comp.sketches.add(needle_comp.xYConstructionPlane)
+            sk_c.sketchCurves.sketchLines.addTwoPointRectangle(
+                adsk.core.Point3D.create(xc_needle, yc_needle, 0), adsk.core.Point3D.create(xc_needle + mm(20.0), yc_needle + mm(20.0), 0))
+            c_col = adsk.core.ObjectCollection.create()
+            for i in range(sk_c.profiles.count): c_col.add(sk_c.profiles.item(i))
+            cut_c = needle_comp.features.extrudeFeatures.createInput(c_col, adsk.fusion.FeatureOperations.CutFeatureOperation)
+            cut_c.setDistanceExtent(False, adsk.core.ValueInput.createByString("10 mm"))
+            cut_c.participantBodies = [needle_body]
+            needle_comp.features.extrudeFeatures.add(cut_c)
+
+            # Tip Sharpening
+            sk_tip = needle_comp.sketches.add(needle_comp.xYConstructionPlane)
+            lines_t = sk_tip.sketchCurves.sketchLines
+            p_t1 = adsk.core.Point3D.create(xc_needle + mm(13.0), yc_needle, 0)
+            p_t2 = adsk.core.Point3D.create(xc_needle + mm(15.0), yc_needle, 0)
+            p_t3 = adsk.core.Point3D.create(xc_needle + mm(13.0), yc_needle - mm(4.0), 0)
+            lines_t.addByTwoPoints(p_t1, p_t2); lines_t.addByTwoPoints(p_t2, p_t3); lines_t.addByTwoPoints(p_t3, p_t1)
+            t_col = adsk.core.ObjectCollection.create()
+            for i in range(sk_tip.profiles.count): t_col.add(sk_tip.profiles.item(i))
+            cut_tip = needle_comp.features.extrudeFeatures.createInput(t_col, adsk.fusion.FeatureOperations.CutFeatureOperation)
+            cut_tip.setDistanceExtent(False, adsk.core.ValueInput.createByString("10 mm"))
+            cut_tip.participantBodies = [needle_body]
+            needle_comp.features.extrudeFeatures.add(cut_tip)
+
+        # 3. Wire Slider Actuator Block (12 x 7 x 4mm at Z=3~7mm)
+        slider_occ = root_comp.occurrences.addNewComponent(adsk.core.Matrix3D.create())
+        slider_comp = slider_occ.component
+        slider_comp.name = "Wire_Slider_Block"
+
+        sk_s = slider_comp.sketches.add(slider_comp.xYConstructionPlane)
+        sk_s.sketchCurves.sketchLines.addTwoPointRectangle(
+            adsk.core.Point3D.create(mm(-18.0), mm(-3.5), 0), adsk.core.Point3D.create(mm(-6.0), mm(3.5), 0))
+        ext_s = slider_comp.features.extrudeFeatures.createInput(sk_s.profiles.item(0), adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
+        ext_s.setDistanceExtent(False, adsk.core.ValueInput.createByString("4 mm"))
+        ext_s.startExtent = adsk.fusion.OffsetStartDefinition.create(adsk.core.ValueInput.createByString("3 mm"))
+        slider_comp.features.extrudeFeatures.add(ext_s)
+
+        # Slider Pin
+        sk_pin = slider_comp.sketches.add(slider_comp.xYConstructionPlane)
+        sk_pin.sketchCurves.sketchCircles.addByCenterRadius(adsk.core.Point3D.create(mm(-12.0), mm(0.0), 0), mm(1.5))
+        ext_pin = slider_comp.features.extrudeFeatures.createInput(sk_pin.profiles.item(0), adsk.fusion.FeatureOperations.JoinFeatureOperation)
+        ext_pin.setDistanceExtent(False, adsk.core.ValueInput.createByString("3 mm"))
+        ext_pin.startExtent = adsk.fusion.OffsetStartDefinition.create(adsk.core.ValueInput.createByString("7 mm"))
+        slider_comp.features.extrudeFeatures.add(ext_pin)
+
+        # 4. As-Built Joints & Motion Links (Zero Error B-Rep Edge Mapping)
+        as_built_joints = root_comp.asBuiltJoints
+        main_occ.isGrounded = True
+
+        # 4.1 Revolute Joint (Circular Edge from Needle Body)
+        needle_circle_edge = None
+        if needle_body:
+            for edge in needle_body.edges:
+                if edge.geometry.curveType in [adsk.core.Curve3DTypes.Circle3DCurveType, adsk.core.Curve3DTypes.Arc3DCurveType]:
+                    needle_circle_edge = edge; break
+
+        geo_needle = adsk.fusion.JointGeometry.createByCurve(needle_circle_edge, adsk.fusion.JointKeyPointTypes.CenterKeyPoint)
+        rev_in = as_built_joints.createInput(needle_occ, main_occ, geo_needle)
+        rev_in.setAsRevoluteJointMotion(adsk.fusion.JointDirections.ZAxisJointDirection)
+        rev_joint = as_built_joints.add(rev_in)
+        rev_joint.name = "Needle_Rotation_Joint"
+
+        # 4.2 Slider Joint (Linear Edge from Slider Body)
+        slider_linear_edge = None
+        slider_body = slider_comp.bRepBodies.item(0) if slider_comp.bRepBodies.count > 0 else None
+        if slider_body:
+            for edge in slider_body.edges:
+                if edge.geometry.curveType == adsk.core.Curve3DTypes.Line3DCurveType:
+                    ret, start_pt, end_pt = edge.evaluator.getEndPoints()
+                    if ret and abs(start_pt.y - end_pt.y) < 1e-4 and abs(start_pt.z - end_pt.z) < 1e-4:
+                        slider_linear_edge = edge; break
+
+        geo_slider = adsk.fusion.JointGeometry.createByCurve(slider_linear_edge, adsk.fusion.JointKeyPointTypes.MiddleKeyPoint)
+        slider_in = as_built_joints.createInput(slider_occ, main_occ, geo_slider)
+        slider_in.setAsSliderJointMotion(adsk.fusion.JointDirections.XAxisJointDirection)
+        slider_joint = as_built_joints.add(slider_in)
+        slider_joint.name = "Wire_Slider_Joint"
+
+        # 4.3 Motion Link (Wire Transmission: 180 deg = pi * 1.5 cm)
+        motion_links = root_comp.motionLinks
+        ml_input = motion_links.createInput(slider_joint, rev_joint)
+        ml_input.distance = mm(math.pi * 15.0)
+        ml_input.angle = math.pi
+        ml = motion_links.add(ml_input)
+        ml.name = "Wire_Tension_Transmission"
+
+        # 5. Visual Enhancement
+        main_comp.opacity = 0.75
+        vp = app.activeViewport
+        if vp:
+            camera = vp.camera
+            camera.isFitView = True
+            vp.camera = camera
+            vp.refresh()
+
+    except Exception as e:
+        raise e
+
+if __name__ == "__main__":
+    run(None)
+</code></pre>
+
+    <footer>
+        Endocrab 와이어 구동 기반 설계 마스터 문서 v3.0 (최종 에러 완벽 해결본) | 작성일: 2026-08-18<br>
+        <em>AI 에이전트여, 위 문서를 완벽히 인지한 상태로 다음 코딩을 진행하십시오.</em>
+    </footer>
+</div>
+
+</body>
+</html>

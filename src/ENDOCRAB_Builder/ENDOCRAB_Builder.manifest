@@ -1,0 +1,10 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"script",
+	"id":	"endocrab-3d-cad-builder",
+	"author":	"Antigravity Agent",
+	"description":	"Parametric 3D CAD Builder Script for ENDOCRAB Medical Device",
+	"version":	"1.0.0",
+	"runOnStartup":	false,
+	"supportedOS":	"windows"
+}

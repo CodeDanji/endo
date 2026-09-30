@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ENDOCRAB Surgical Device Parameter Schema",
+  "type": "object",
+  "properties": {
+    "Body_Length": {
+      "type": "string",
+      "description": "Main handle/casing total axial length",
+      "default": "65.0 mm",
+      "minimum": 30.0,
+      "maximum": 150.0
+    },
+    "Outer_Diameter": {
+      "type": "string",
+      "description": "Endoscopic shaft outer diameter",
+      "default": "5.0 mm",
+      "minimum": 2.0,
+      "maximum": 12.0
+    },
+    "Needle_Outer_Dia": {
+      "type": "string",
+      "description": "3D Toroidal ring needle outer diameter",
+      "default": "12.0 mm",
+      "minimum": 5.0,
+      "maximum": 25.0
+    },
+    "Needle_Wire_Dia": {
+      "type": "string",
+      "description": "Cross-sectional wire diameter of suture needle",
+      "default": "1.2 mm",
+      "minimum": 0.5,
+      "maximum": 3.0
+    },
+    "Needle_Sweep_Angle": {
+      "type": "string",
+      "description": "Toroidal arc sweep rotation angle in degrees",
+      "default": "330.0 deg",
+      "minimum": 180.0,
+      "maximum": 360.0
+    },
+    "Gripper_Jaw_Length": {
+      "type": "string",
+      "description": "Dual serrated jaw articulation length",
+      "default": "25.0 mm",
+      "minimum": 10.0,
+      "maximum": 50.0
+    },
+    "Gripper_Jaw_Width": {
+      "type": "string",
+      "description": "Jaw width at clamping interface",
+      "default": "4.0 mm",
+      "minimum": 1.5,
+      "maximum": 10.0
+    },
+    "Track_Clearance": {
+      "type": "string",
+      "description": "Internal mechanical track clearance tolerance",
+      "default": "0.2 mm",
+      "minimum": 0.05,
+      "maximum": 1.0
+    },
+    "Gear_Module": {
+      "type": "string",
+      "description": "Involute gear tooth module M",
+      "default": "0.3 mm",
+      "minimum": 0.1,
+      "maximum": 1.0
+    },
+    "Gear_Teeth_Count": {
+      "type": "string",
+      "description": "Drive pinion teeth count Z",
+      "default": "12",
+      "minimum": 8,
+      "maximum": 64
+    }
+  },
+  "required": ["Body_Length", "Outer_Diameter", "Needle_Outer_Dia"]
+}

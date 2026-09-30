@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENDOCRAB & Surgical Auto-Suturing Device Engineering CAD Blueprint Specification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050811;
+            --bg-card: rgba(13, 20, 36, 0.9);
+            --bg-card-hover: rgba(22, 33, 58, 0.95);
+            --border-color: rgba(56, 189, 248, 0.2);
+            --border-highlight: rgba(56, 189, 248, 0.6);
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.35);
+            --secondary: #818cf8;
+            --accent: #f43f5e;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --blueprint-bg: #091322;
+            --blueprint-grid: rgba(56, 189, 248, 0.12);
+            --blueprint-line: #38bdf8;
+            --blueprint-dim: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #64748b;
+            --code-bg: #0b1120;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.65;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 90% 90%, rgba(129, 140, 248, 0.08) 0%, transparent 45%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 3rem 2rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--success));
+        }
+
+        .badge-group {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 1.1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 50px;
+        }
+
+        .badge-primary {
+            color: var(--primary);
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .badge-secondary {
+            color: var(--secondary);
+            background: rgba(129, 140, 248, 0.12);
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+
+        .badge-accent {
+            color: var(--accent);
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Grid Cards */
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card:hover {
+            border-color: var(--border-highlight);
+            box-shadow: 0 20px 40px -15px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 2;
+        }
+
+        /* Blueprint Canvas */
+        .blueprint-container {
+            background-color: var(--blueprint-bg);
+            background-image: 
+                linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            border: 1.5px dashed var(--blueprint-line);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blueprint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--blueprint-grid);
+            padding-bottom: 0.5rem;
+        }
+
+        .blueprint-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Data Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(56, 189, 248, 0.08);
+            color: var(--primary);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .param-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            background: rgba(129, 140, 248, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(129, 140, 248, 0.2);
+        }
+
+        .val-highlight {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        /* Code Block */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            margin: 1.25rem 0;
+            line-height: 1.5;
+        }
+
+        .code-keyword { color: #f43f5e; }
+        .code-func { color: #38bdf8; }
+        .code-string { color: #34d399; }
+        .code-comment { color: #64748b; font-style: italic; }
+
+        /* Formula Box */
+        .formula-box {
+            background: rgba(15, 23, 42, 0.7);
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.25rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .formula-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .formula-math {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Comparison Grid */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .comp-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .comp-card.old {
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+
+        .comp-card.new {
+            border-color: rgba(52, 211, 153, 0.4);
+        }
+
+        .comp-header {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comp-card.old .comp-header { color: var(--accent); }
+        .comp-card.new .comp-header { color: var(--success); }
+
+        ul.spec-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul.spec-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        ul.spec-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <div class="badge-group">
+            <span class="badge badge-primary">Autodesk Fusion 360 API</span>
+            <span class="badge badge-secondary">Medical Device CAD Specification</span>
+            <span class="badge badge-accent">Nature Sci Rep 2024 & IIT Bombay Reference</span>
+        </div>
+        <h1>ENDOCRAB & Surgical Auto-Suturing Device</h1>
+        <p class="subtitle">High-Precision Master Engineering CAD Blueprint Specification Document. Integrating Dual-System Surgical Architectures: Flexible Endoscopic Suturing (Nature 2024) & Rigid Laparoscopic Pistol-Grip System (IIT Bombay).</p>
+    </header>
+
+    <!-- Section 1: Executive Design Overview -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+        <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            1. Executive System Architecture & Reference Comparison
+        </div>
+
+        <p style="margin-bottom: 1.25rem; color: var(--text-muted);">
+            This document specifies the master parametric CAD architecture for the <strong>ENDOCRAB Surgical Auto-Suturing System</strong>. To eliminate simplistic draft shapes, the model synthesizes two state-of-the-art clinical devices into a unified, modular CAD assembly:
+        </p>
+
+        <div class="comp-grid">
+            <div class="comp-card old">
+                <div class="comp-header">
+                    ⚠️ Baseline Implementation (Crude Box Model)
+                </div>
+                <ul class="spec-list">
+                    <li>Basic 2D rectangular extrusions without anatomical fillets or chamfers.</li>
+                    <li>Static dummy jaws without functional serrated gripping teeth.</li>
+                    <li>Simple circular ring outline lacking true 3D toroidal geometry and gear rack notches.</li>
+                    <li>Single monolithic handle without dual endoscopic/laparoscopic modularity.</li>
+                    <li>Missing knotting clip fastener assembly and scope cap friction ribs.</li>
+                </ul>
+            </div>
+
+            <div class="comp-card new">
+                <div class="comp-header">
+                    ✅ Refactored Master CAD Model (Image 1 & Image 2/3 Compliant)
+                </div>
+                <ul class="spec-list">
+                    <li><strong>Image 1 (IIT Bombay Laparoscopic Device)</strong>: Ergonomic pistol-grip handle, 2-click indexing trigger, rigid Ø10mm tubular shaft, quick-release coupler.</li>
+                    <li><strong>Image 2 & 3 (Nature Sci Rep 2024 ENDOCRAB)</strong>: Micro machined distal head casing ($20 \times 15 \times 5.45\text{mm}$), dual-stage serrated gripper jaws, 360° toroidal ring needle with gear rack, M0.3 pinion gear shuttle, syringe plunger handle with dual finger slider rings.</li>
+                    <li><strong>Knotless Fastening System</strong>: Male stud & female lock ring cinch clip for automatic suture locking.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Technical Blueprint SVG Views -->
+    <div class="section-grid">
+
+        <!-- Card 2A: Distal Head Blueprint -->
+        <div class="card">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>
+                2A. Distal End-Effector Housing Blueprint (Image 2a & 1)
+            </div>
+            
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                Micro-machined 316L stainless steel frame containing circular needle guide track slot, dual hinge pin bosses, and tissue gripper jaws.
+            </p>
+
+            <div class="blueprint-container">
+                <div class="blueprint-header">
+                    <span>DRAWING NO: ENDO-CAD-01</span>
+                    <span>SCALE: 4:1 | UNITS: MM</span>
+                </div>
+                <svg class="blueprint-svg" viewBox="0 0 600 320">
+                    <!-- Grid Background -->
+                    <defs>
+                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(56,189,248,0.15)" stroke-width="0.5"/>
+                        </pattern>
+                    </defs>
+                    <rect width="600" height="320" fill="url(#grid)" />
+
+                    <!-- Main Body Frame Outline -->
+                    <rect x="140" y="80" width="300" height="140" rx="12" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="none"/>
+                    <!-- Scope Cap Collar Attachment -->
+                    <rect x="60" y="95" width="80" height="110" rx="6" fill="none" stroke="#818cf8" stroke-width="2" stroke-dasharray="4 2"/>
+                    <text x="100" y="155" fill="#818cf8" font-family="JetBrains Mono" font-size="10" text-anchor="middle">Scope Mount</text>
+
+                    <!-- Circular Needle Track Ring (360 Deg Toroid) -->
+                    <circle cx="380" cy="150" r="65" fill="none" stroke="#38bdf8" stroke-width="3"/>
+                    <circle cx="380" cy="150" r="53" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+                    <!-- C-shaped Ring Needle Toroid -->
+                    <path d="M 380 85 A 65 65 0 1 1 315 150" fill="none" stroke="#f43f5e" stroke-width="4.5" stroke-linecap="round"/>
+                    <polygon points="315,150 310,138 322,142" fill="#f43f5e"/>
+
+                    <!-- Serrated Gripper Jaws (Left & Right) -->
+                    <!-- Top Jaw -->
+                    <path d="M 390 75 Q 440 45 470 50 L 460 65 Q 430 60 395 85 Z" fill="rgba(52,211,153,0.2)" stroke="#34d399" stroke-width="2"/>
+                    <!-- Teeth serrations -->
+                    <line x1="420" y1="53" x2="423" y2="60" stroke="#34d399" stroke-width="1.5"/>
+                    <line x1="435" y1="51" x2="438" y2="59" stroke="#34d399" stroke-width="1.5"/>
+                    <line x1="450" y1="52" x2="453" y2="61" stroke="#34d399" stroke-width="1.5"/>
+
+                    <!-- Bottom Jaw -->
+                    <path d="M 390 225 Q 440 255 470 250 L 460 235 Q 430 240 395 215 Z" fill="rgba(52,211,153,0.2)" stroke="#34d399" stroke-width="2"/>
+                    <!-- Teeth serrations -->
+                    <line x1="420" y1="247" x2="423" y2="240" stroke="#34d399" stroke-width="1.5"/>
+                    <line x1="435" y1="249" x2="438" y2="241" stroke="#34d399" stroke-width="1.5"/>
+                    <line x1="450" y1="248" x2="453" y2="239" stroke="#34d399" stroke-width="1.5"/>
+
+                    <!-- Hinge Pins Ø1.0mm -->
+                    <circle cx="390" cy="85" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="1"/>
+                    <circle cx="390" cy="215" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="1"/>
+
+                    <!-- Pinion Gear Shuttle M0.3 -->
+                    <circle cx="310" cy="150" r="18" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1.5"/>
+                    <text x="310" y="153" fill="#fbbf24" font-family="JetBrains Mono" font-size="9" text-anchor="middle">Z12</text>
+
+                    <!-- Dimensions -->
+                    <!-- Body Length 50mm -->
+                    <line x1="140" y1="260" x2="440" y2="260" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2 2"/>
+                    <line x1="140" y1="250" x2="140" y2="270" stroke="#f59e0b" stroke-width="1"/>
+                    <line x1="440" y1="250" x2="440" y2="270" stroke="#f59e0b" stroke-width="1"/>
+                    <text x="290" y="275" fill="#f59e0b" font-family="JetBrains Mono" font-size="11" text-anchor="middle">L = 50.0 mm</text>
+
+                    <!-- Outer Dia 13mm -->
+                    <line x1="465" y1="85" x2="465" y2="215" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2 2"/>
+                    <text x="525" y="155" fill="#f59e0b" font-family="JetBrains Mono" font-size="11" text-anchor="middle">Ø 13.0 mm</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Card 2B: Proximal Dual Controller Blueprint -->
+        <div class="card">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                2B. Dual Controller Architecture (System A & System B)
+            </div>
+
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                Dual actuation options: System A Syringe Finger Slider (Nature 2024) & System B Ergonomic Pistol Grip (IITB Image 1).
+            </p>
+
+            <div class="blueprint-container">
+                <div class="blueprint-header">
+                    <span>DRAWING NO: ENDO-CAD-02</span>
+                    <span>DUAL SYSTEM MODULARITY</span>
+                </div>
+                <svg class="blueprint-svg" viewBox="0 0 600 320">
+                    <rect width="600" height="320" fill="url(#grid)" />
+
+                    <!-- System A: Syringe Slider Handle (Top Half) -->
+                    <g transform="translate(20, 20)">
+                        <text x="0" y="20" fill="#38bdf8" font-family="Outfit" font-size="13" font-weight="700">SYSTEM A: Endoscopic Plunger Slider (Image 2c)</text>
+                        <!-- Main Rail -->
+                        <rect x="50" y="35" width="220" height="16" rx="4" fill="rgba(255,255,255,0.08)" stroke="#38bdf8" stroke-width="1.5"/>
+                        <!-- Thumb Ring -->
+                        <circle cx="35" cy="43" r="20" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+                        <circle cx="35" cy="43" r="13" fill="none" stroke="#38bdf8" stroke-width="1"/>
+                        <!-- Orange Finger Sliders -->
+                        <circle cx="130" cy="43" r="18" fill="rgba(255,110,0,0.3)" stroke="#ff6e00" stroke-width="2"/>
+                        <circle cx="130" cy="43" r="11" fill="none" stroke="#ffffff" stroke-width="1"/>
+                        <circle cx="170" cy="43" r="18" fill="rgba(255,110,0,0.3)" stroke="#ff6e00" stroke-width="2"/>
+                        <circle cx="170" cy="43" r="11" fill="none" stroke="#ffffff" stroke-width="1"/>
+                    </g>
+
+                    <!-- Separator Line -->
+                    <line x1="30" y1="140" x2="570" y2="140" stroke="rgba(255,255,255,0.15)" stroke-dasharray="4 4"/>
+
+                    <!-- System B: Pistol Grip Handle (Bottom Half) -->
+                    <g transform="translate(20, 150)">
+                        <text x="0" y="20" fill="#818cf8" font-family="Outfit" font-size="13" font-weight="700">SYSTEM B: Laparoscopic Pistol Grip (Image 1)</text>
+                        <!-- Pistol Handle Body -->
+                        <path d="M 80 40 L 180 40 L 160 140 L 120 140 L 100 80 Z" fill="rgba(129,140,248,0.15)" stroke="#818cf8" stroke-width="2.5"/>
+                        <!-- Trigger Guard -->
+                        <path d="M 120 50 C 90 50 90 90 120 90 Z" fill="none" stroke="#818cf8" stroke-width="1.5"/>
+                        <!-- 2-Click Trigger Blade -->
+                        <path d="M 105 55 Q 85 70 100 85 L 110 80 Q 98 70 112 60 Z" fill="#fbbf24" stroke="#ffffff" stroke-width="1"/>
+                        <text x="65" y="75" fill="#fbbf24" font-family="JetBrains Mono" font-size="9">2-Click</text>
+                        <!-- Shaft Attachment Collar -->
+                        <rect x="180" y="32" width="80" height="24" rx="4" fill="none" stroke="#34d399" stroke-width="2"/>
+                        <text x="220" y="48" fill="#34d399" font-family="JetBrains Mono" font-size="9" text-anchor="middle">Ø10mm Shaft</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Section 3: Engineering Parameter Table -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+        <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            3. Parametric User Parameters & Engineering Callouts (Fusion 360 fx Bound)
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Nominal Value</th>
+                        <th>Tolerance</th>
+                        <th>Material Callout</th>
+                        <th>Description & Functional Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="param-tag">Body_Length</span></td>
+                        <td><span class="val-highlight">50.00 mm</span></td>
+                        <td>±0.05 mm</td>
+                        <td>Stainless Steel 316L (Passivated)</td>
+                        <td>Main Distal End-Effector Casing Frame Length</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Body_Width</span></td>
+                        <td><span class="val-highlight">15.00 mm</span></td>
+                        <td>±0.04 mm</td>
+                        <td>Stainless Steel 316L</td>
+                        <td>Distal Frame Overall Width (Fits 20mm Trocar)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Body_Thickness</span></td>
+                        <td><span class="val-highlight">5.45 mm</span></td>
+                        <td>±0.02 mm</td>
+                        <td>Stainless Steel 316L</td>
+                        <td>Profile Height / Depth Clearance</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Scope_Attach_Dia</span></td>
+                        <td><span class="val-highlight">11.50 mm</span></td>
+                        <td>H7 / +0.018 mm</td>
+                        <td>Medical Grade Soft Silicone Rubber</td>
+                        <td>Olympus GIF-Q260 Scope Collar Friction Mount</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Needle_Outer_Dia</span></td>
+                        <td><span class="val-highlight">13.00 mm</span></td>
+                        <td>±0.03 mm</td>
+                        <td>Medical Grade 420 SS Hardened</td>
+                        <td>360° Toroidal Continuous Suturing Ring Needle Outer Dia</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Needle_Wire_Dia</span></td>
+                        <td><span class="val-highlight">1.20 mm</span></td>
+                        <td>±0.01 mm</td>
+                        <td>420 SS High Hardness Wire</td>
+                        <td>Ring Needle Wire Section Diameter</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Gear_Module</span></td>
+                        <td><span class="val-highlight">0.30 mm</span></td>
+                        <td>DIN 3967 7e</td>
+                        <td>Brass / Hardened Stainless Steel</td>
+                        <td>Micro Shuttle Rack & Pinion Drive Module (M0.3)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Pinion_Teeth_Z</span></td>
+                        <td><span class="val-highlight">12</span></td>
+                        <td>Exact Count</td>
+                        <td>Phosphor Bronze / Brass</td>
+                        <td>Drive Pinion Tooth Count ($D_p = 3.60\text{mm}$)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Cable_Wire_Dia</span></td>
+                        <td><span class="val-highlight">0.60 mm</span></td>
+                        <td>±0.02 mm</td>
+                        <td>SS304 7x7 Wire Rope Cable</td>
+                        <td>Dual Flexible Push-Pull Actuation Cable</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Suture_Dia</span></td>
+                        <td><span class="val-highlight">0.15 mm</span></td>
+                        <td>USP 4-0 Standard</td>
+                        <td>Nylon Monofilament (Ethilon)</td>
+                        <td>Suture Thread Diameter attached to Needle Ring</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-tag">Cinch_Stud_Dia</span></td>
+                        <td><span class="val-highlight">2.20 mm</span></td>
+                        <td>±0.02 mm</td>
+                        <td>PEEK / Bio-absorbable PLA</td>
+                        <td>Knotless Suture Anchor Male Stud Diameter</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 4: Kinematic & Mechanical Formulas -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+        <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path></svg>
+            4. Kinematic & Mechanical Design Calculations
+        </div>
+
+        <div class="section-grid" style="margin-bottom: 0;">
+            <div class="formula-box">
+                <div class="formula-title">1. Pinion Drive Torque & Pitch Circle Diameter</div>
+                <div class="formula-math">D_p = m \cdot Z = 0.30 \text{ mm} \times 12 = 3.60 \text{ mm}</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    The pitch circle diameter \(D_p\) dictates needle rotation speed relative to cable linear stroke \(S_{\text{cable}}\): \(S_{\text{cable}} = \pi \cdot D_p \cdot (\theta_{\text{needle}} / 360^\circ)\).
+                </p>
+            </div>
+
+            <div class="formula-box">
+                <div class="formula-title">2. Tissue Clamping Force (Gripper Linkage)</div>
+                <div class="formula-math">F_{\text{clamp}} = \frac{T_{\text{cable}} \cdot L_{\text{link}}}{L_{\text{jaw}} \cdot \sin(\theta_{\text{link}})}</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    With cable tension \(T_{\text{cable}} = 15\text{N}\), jaw length \(L_{\text{jaw}} = 6.0\text{mm}\), maximum clamping force \(F_{\text{clamp}} \ge 8.5\text{N}\) ensures non-slip tissue grasp without tear.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 5: Fusion 360 Master Builder Script Code -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+        <div class="card-title">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            5. Fusion 360 Parametric Builder Script Structure
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+            The Python script <code>src/build_endocrab_model.py</code> executes inside Fusion 360 API, creating all 5 sub-assemblies with accurate 3D CAD features:
+        </p>
+
+        <pre><code><span class="code-comment"># ENDOCRAB 3D CAD Parametric Master Builder Engine</span>
+<span class="code-keyword">import</span> adsk.core, adsk.fusion
+
+<span class="code-keyword">def</span> <span class="code-func">build_endocrab_assembly</span>():
+    app = adsk.core.Application.get()
+    design = adsk.fusion.Design.cast(app.activeProduct)
+    
+    <span class="code-comment"># 1. Register 20+ User Parameters in fx</span>
+    create_user_parameters(design)
+    
+    <span class="code-comment"># 2. Build Sub-Assemblies</span>
+    build_distal_endeffector(root_comp, design)      <span class="code-comment"># Distal Head Frame, 360° Ring Needle, Serrated Grippers</span>
+    build_cable_actuation(root_comp, design)         <span class="code-comment"># Dual Wire Cables & PTFE Sheath</span>
+    build_proximal_controller(root_comp, design)     <span class="code-comment"># System A (Syringe Slider) & System B (Pistol Grip)</span>
+    build_knotting_fastener(root_comp, design)       <span class="code-comment"># Male Stud & Female Lock Ring Cinch Fastener</span>
+    
+    <span class="code-comment"># 3. Create Kinematic Assembly Joints (Rigid, Revolute, Slider)</span>
+    create_assembly_joints(root_comp)</code></pre>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 ENDOCRAB Project Team. Master CAD Engineering Blueprint Specification. Refactored for Autodesk Fusion 360 API.</p>
+    </footer>
+
+</div>
+
+</body>
+</html>

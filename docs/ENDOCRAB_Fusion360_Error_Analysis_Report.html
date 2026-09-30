@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENDOCRAB Fusion 360 CAD API Implementation Error Analysis & Resolution Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(21, 30, 48, 0.75);
+            --bg-card-hover: rgba(30, 43, 67, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(56, 189, 248, 0.4);
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.25);
+            --secondary: #818cf8;
+            --accent: #f43f5e;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-sub: #6b7280;
+            --code-bg: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.65;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(244, 63, 94, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--warning), var(--primary));
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            border-radius: 50px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 850px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+        }
+
+        .card-full {
+            grid-column: 1 / -1;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.2rem;
+            background: var(--primary);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .error-tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .tag-api { background: rgba(244, 63, 94, 0.15); color: var(--accent); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .tag-python { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .tag-rest { background: rgba(129, 140, 248, 0.15); color: var(--secondary); border: 1px solid rgba(129, 140, 248, 0.3); }
+        .tag-resolved { background: rgba(52, 211, 153, 0.15); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.3); }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1rem 0;
+            font-size: 0.88rem;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--primary);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 0.8rem 1rem;
+            color: var(--text-main);
+            background: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(56, 189, 248, 0.05); }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.1rem;
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            line-height: 1.55;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--secondary);
+            background: rgba(129, 140, 248, 0.1);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        .code-err { color: #f87171; }
+        .code-fix { color: #4ade80; }
+
+        .callout {
+            background: rgba(56, 189, 248, 0.08);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .callout-warn {
+            background: rgba(251, 191, 36, 0.08);
+            border-left-color: var(--warning);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="badge">Fusion 360 API Debugging Report</span>
+            <h1>ENDOCRAB CAD API Error Analysis & Handover Document</h1>
+            <p class="subtitle">Autodesk Fusion 360 Python API 연동 개발 중 발생한 5가지 핵심 오류의 기술적 원인, 세부 분석, 해결책 및 다음 대화 가이드</p>
+            <div class="meta-info">
+                <div>Document: <strong>ENDOCRAB_Fusion360_Error_Analysis_Report.html</strong></div>
+                <div>Target CAD: <strong>Autodesk Fusion 360</strong></div>
+                <div>Status: <strong>Documented & Prepared for Next Session Analysis</strong></div>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- 1. Executive Summary Table -->
+            <div class="card card-full">
+                <h2>1. 요약 오류 내역표 (Summary Error Matrix)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Error Class / Message</th>
+                            <th>Occurred Location</th>
+                            <th>Root Cause Summary</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><span class="error-tag tag-python">SyntaxError</span> name 'app' used prior to global declaration</td>
+                            <td><code>AntigravityOnDemand.py:do_POST()</code></td>
+                            <td>파이썬 메서드 내 <code>global</code> 선언 위치 오류 (참조 후 선언)</td>
+                            <td><span class="error-tag tag-resolved">Resolved</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><span class="error-tag tag-rest">HTTP Error 404</span> Not Found on <code>POST /build</code></td>
+                            <td>REST Client & Python HTTP Server</td>
+                            <td>Fusion 360 파이썬 프로세스 메모리의 이전 서버 인스턴스 미갱신</td>
+                            <td><span class="error-tag tag-resolved">Resolved</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><span class="error-tag tag-api">AttributeError</span> can't set attribute 'name'</td>
+                            <td><code>build_endocrab_model.py:368</code></td>
+                            <td>Fusion 360 API에서 <code>doc.name</code> 속성은 읽기 전용 (Read-Only)</td>
+                            <td><span class="error-tag tag-resolved">Resolved</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><span class="error-tag tag-api">RuntimeError</span> 3 : root component name cannot be changed</td>
+                            <td><code>build_endocrab_model.py:379</code></td>
+                            <td>Fusion 360 API에서 루트 컴포넌트 이름 변경 불가 <code>root_comp.name</code></td>
+                            <td><span class="error-tag tag-resolved">Resolved</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><span class="error-tag tag-python">Module Cache</span> Persistence (<code>__pycache__</code> / <code>sys.modules</code>)</td>
+                            <td>Fusion 360 Python Process Memory</td>
+                            <td>소소코드 수정 후에도 Fusion 360 파이썬 메모리가 이전 컴파일 모듈을 유지</td>
+                            <td><span class="error-tag tag-resolved">Resolved</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 2. Detailed Error 1 & 2 -->
+            <div class="card">
+                <h2>오류 1: 파이썬 global 선언 위치 예외</h2>
+                <span class="error-tag tag-python">SyntaxError</span>
+                <p style="margin-top: 0.75rem;"><strong>오류 메시지:</strong> <code>SyntaxError: name 'app' is used prior to global declaration</code></p>
+                <div class="callout">
+                    <strong>원인 분석:</strong> Python 언어 규격상 함수/메서드 내부에서 글로벌 변수를 참조하기 전 최상단에 <code>global</code>을 선언해야 합니다. <code>do_POST()</code> 내부의 <code>elif</code> 블록에 <code>global app</code>을 별도 선언하여 예외가 발생했습니다.
+                </div>
+                <pre><span class="code-err"># [수정 전 오류 코드]
+def do_POST(self):
+    if self.path == "/modify":
+        global app, modify_event_id  # 1차 선언
+        if app: ...
+    elif self.path == "/build":
+        global app, build_event_id   # ❌ app이 이미 참조된 후 재선언되어 SyntaxError 발생</span>
+
+<span class="code-fix"># [수정 후 정제 코드]
+def do_POST(self):
+    global app, modify_event_id, build_event_id  # ✅ 메서드 최상단 일괄 선언
+    if self.path == "/modify": ...
+    elif self.path == "/build": ...</span></pre>
+            </div>
+
+            <div class="card">
+                <h2>오류 2: REST /build 엔드포인트 404 예외</h2>
+                <span class="error-tag tag-rest">HTTP Error 404</span>
+                <p style="margin-top: 0.75rem;"><strong>오류 메시지:</strong> <code>urllib.error.HTTPError: HTTP Error 404: Not Found</code></p>
+                <div class="callout">
+                    <strong>원인 분석:</strong> Fusion 360 실행 중 `AntigravityOnDemand.py` 소스코드에 `/build` 엔드포인트를 추가하더라도, 이미 Fusion 360 파이썬 프로세스 메모리에 로드된 기존 REST 서버 클래스는 새 코드를 인식하지 못하고 404를 반환했습니다.
+                </div>
+                <div class="callout callout-warn">
+                    <strong>해결책:</strong> Fusion 360의 <code>Scripts and Add-Ins</code> 창에서 <code>AntigravityOnDemand</code>를 <code>Stop</code> ➔ <code>Run</code>하여 프로세스 내 서버 클래스를 재로드.
+                </div>
+            </div>
+
+            <!-- 3. Detailed Error 3 & 4 (Critical Fusion 360 API Errors) -->
+            <div class="card card-full">
+                <h2>오류 3 & 4: Fusion 360 API 읽기전용/루트 변경 불가능 예외 (핵심)</h2>
+                <p>Fusion 360 3D 모델링 생성 파이프라인 중 발생한 가장 결정적인 2가지 API 속성 예외입니다.</p>
+
+                <h3>오류 3: Document Name Read-Only 예외</h3>
+                <p><strong>오류 메시지:</strong> <code>AttributeError: can't set attribute 'name'</code></p>
+                <pre><span class="code-err"># [원인 코드 - line 368]
+doc = app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
+doc.name = "ENDOCRAB_Master_Assembly.f3d"  # ❌ AttributeError 발생! (Fusion 360 doc.name은 읽기 전용)</span></pre>
+                <p><strong>여파:</strong> `doc.name` 설정 시 예외가 던져져 신규 빈 문서만 생성되고, 하위 3D 솔리드/스케치/파라메트릭 생성 함수가 전부 실행되지 않고 중단됨.</p>
+
+                <h3 style="margin-top: 1.5rem;">오류 4: Root Component Name Lock 예외</h3>
+                <p><strong>오류 메시지:</strong> <code>RuntimeError: 3 : root component name cannot be changed</code></p>
+                <pre><span class="code-err"># [원인 코드 - line 379]
+root_comp = design.rootComponent
+root_comp.name = "ENDOCRAB_Master_Assembly"  # ❌ RuntimeError 발생! (Root Component 이름은 수정 불가)</span>
+
+<span class="code-fix"># [수정 완료 코드]
+root_comp = design.rootComponent  # ✅ root_comp.name 설정 구문 완전 제거</span></pre>
+            </div>
+
+            <!-- 4. Error 5 & Python Module Caching Mechanism -->
+            <div class="card card-full">
+                <h2>오류 5: 파이썬 모듈 캐싱 및 바이트코드 영속성 (Pycache Persistence)</h2>
+                <span class="error-tag tag-python">Module Cache</span>
+                <p style="margin-top: 0.75rem;"><strong>현상:</strong> 디스크 상에서 `build_endocrab_model.py`의 오류 코드를 수정했음에도 불구하고, Fusion 360에서 스크립트를 재실행할 때 계속해서 이전 에러 Traceback(line 379 `root_comp.name` 오류)이 반복 출력됨.</p>
+                
+                <div class="callout">
+                    <strong>원인 메커니즘:</strong>
+                    <ol style="margin-left: 1.25rem; margin-top: 0.5rem;">
+                        <li>Fusion 360의 파이썬 인터프리터는 실행 시 `sys.modules` 딕셔너리에 한번 로드된 임포트 모듈을 캡처하여 보관합니다.</li>
+                        <li>또한 `__pycache__/*.pyc` 바이트코드 파일이 남아있는 경우, 디스크의 `.py` 변경사항을 무시하고 캐시된 바이트코드를 재사용합니다.</li>
+                        <li>단순히 Add-in을 Stop/Run 하더라도 `sys.modules`에 등록된 하위 모듈(`build_endocrab_model`)은 갱신되지 않습니다.</li>
+                    </ol>
+                </div>
+
+                <h3>완벽 해결을 위한 구조적 개선안 (Implementation)</h3>
+                <pre><span class="code-fix"># 1. 자동 배포 시 pycache 강제 삭제 (install_to_fusion360.ps1)
+Get-ChildItem -Path $TargetDir -Recurse -Filter "*.pyc" | Remove-Item -Force
+Get-ChildItem -Path $TargetDir -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force
+
+# 2. ENDOCRAB_Builder.py 및 AntigravityOnDemand.py에서 dynamic exec() 적용
+script_path = os.path.join(SCRIPT_DIR, "build_endocrab_model.py")
+with open(script_path, "r", encoding="utf-8") as f:
+    code = f.read()
+exec_globals = {"__file__": script_path, "__name__": "__main__"}
+exec(code, exec_globals)  # ✅ sys.modules 캐싱을 완전히 우회하여 최신 코드 즉시 실행!</span></pre>
+            </div>
+
+            <!-- 5. Next Session Analysis Guide -->
+            <div class="card card-full">
+                <h2>5. 다음 대화 세션 분석 및 실행 매뉴얼 (Next Session Action Plan)</h2>
+                <p>다음 대화 세션에서는 본 보고서를 바탕으로 Fusion 360 모델링 생성 결과를 최종 확인하고 다음 정밀 조작을 이어갑니다.</p>
+                <div class="callout">
+                    <strong>다음 대화 시작 시 요청 가이드:</strong><br>
+                    1. <em>"이전에 작성한 <code>docs/ENDOCRAB_Fusion360_Error_Analysis_Report.html</code> 기반으로 Fusion 360 3D CAD 모델링 최종 검증 및 뷰포트 상태 확인 진행해줘"</em><br>
+                    2. AI가 <code>GET http://localhost:8080/inspect</code>를 호출하여 뷰포트 PNG 이미지 및 9개 <code>fx</code> 파라메트릭 치수 반영 상태를 시각/수치로 동시 검증.
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>ENDOCRAB Fusion 360 CAD API Error Analysis Report • Prepared for Next Session Debugging & Verification</p>
+        </footer>
+    </div>
+</body>
+</html>

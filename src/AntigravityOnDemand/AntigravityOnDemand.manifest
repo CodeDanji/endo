@@ -1,0 +1,10 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"antigravity-ondemand-bridge",
+	"author":	"Antigravity Agent",
+	"description":	"On-Demand REST Server for Antigravity AI Agent Interaction",
+	"version":	"2.1.0",
+	"runOnStartup":	true,
+	"supportedOS":	"windows"
+}

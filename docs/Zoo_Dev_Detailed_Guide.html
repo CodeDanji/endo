@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoo (zoo.dev) - 마스터 기술 레퍼런스 & 실용 가이드</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #060911;
+            --bg-card: rgba(15, 23, 42, 0.8);
+            --bg-card-hover: rgba(30, 41, 59, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(56, 189, 248, 0.4);
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.25);
+            --secondary: #c084fc;
+            --accent: #f472b6;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #64748b;
+            --code-bg: #0b1329;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 3rem 1.5rem;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 90% 60%, rgba(192, 132, 252, 0.08) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 3.5rem;
+            padding-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.15;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.25rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 950px;
+        }
+
+        .meta-info {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 1.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.25s ease;
+        }
+
+        .card:hover {
+            border-color: var(--border-highlight);
+            background: var(--bg-card-hover);
+            box-shadow: 0 16px 35px -10px var(--primary-glow);
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .card-title .icon {
+            color: var(--primary);
+        }
+
+        .section-header {
+            margin: 4rem 0 2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .section-badge {
+            background: rgba(192, 132, 252, 0.15);
+            border: 1px solid rgba(192, 132, 252, 0.35);
+            color: var(--secondary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.3rem 0.75rem;
+            border-radius: 0.4rem;
+            text-transform: uppercase;
+        }
+
+        ul, ol {
+            padding-left: 1.35rem;
+            color: var(--text-muted);
+        }
+
+        li {
+            margin-bottom: 0.65rem;
+        }
+
+        li strong {
+            color: var(--text-main);
+        }
+
+        .highlight-box {
+            background: rgba(56, 189, 248, 0.06);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0 0.85rem 0.85rem 0;
+            margin: 1.75rem 0;
+            color: var(--text-main);
+        }
+
+        .warning-box {
+            background: rgba(251, 191, 36, 0.06);
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 0 0.85rem 0.85rem 0;
+            margin: 1.75rem 0;
+            color: var(--text-main);
+        }
+
+        .tech-box {
+            background: rgba(192, 132, 252, 0.06);
+            border-left: 4px solid var(--secondary);
+            padding: 1.5rem;
+            border-radius: 0 0.85rem 0.85rem 0;
+            margin: 1.75rem 0;
+            color: var(--text-main);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            color: var(--primary);
+            padding: 0.2rem 0.45rem;
+            border-radius: 0.3rem;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.85rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.25rem 0;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 0.85rem;
+            border: 1px solid var(--border-color);
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--text-main);
+            font-weight: 700;
+            padding: 1.1rem 1.35rem;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1.1rem 1.35rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            background: var(--bg-card);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--bg-card-hover);
+        }
+
+        .badge-success {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(52, 211, 153, 0.35);
+            padding: 0.25rem 0.55rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-warning {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            padding: 0.25rem 0.55rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-primary {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            padding: 0.25rem 0.55rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+            counter-reset: step-counter;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 3.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-item::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.25rem;
+            height: 2.25rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .diagram-container {
+            background: #040711;
+            border: 1px solid var(--border-color);
+            border-radius: 0.85rem;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        footer {
+            margin-top: 6rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        .link-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2));
+            border: 1px solid var(--border-highlight);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.6rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            margin-top: 1.25rem;
+        }
+
+        .link-button:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(192, 132, 252, 0.4));
+            box-shadow: 0 6px 20px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-tag">
+                <span>📘 Complete Master Reference & Practical Guide</span>
+            </div>
+            <h1>Zoo (zoo.dev) 종합 가이드 및 엔지니어링 분석 보고서</h1>
+            <p class="subtitle">개요, GPU 지오메트리 엔진 아키텍처, KCL 컴파일러, Text-to-CAD AI, 사용법, 단계별 상세 설치 가이드, 비용 체계, CAD 벤치마킹 및 장단점 심층 정리</p>
+            <div class="meta-info">
+                <div class="meta-item">📅 문서 버전: v3.0 Master (2026년 8월 통합판)</div>
+                <div class="meta-item">🌐 공식 플랫폼: <a href="https://zoo.dev" target="_blank" style="color: var(--primary); text-decoration: none;">https://zoo.dev</a></div>
+                <div class="meta-item">🏷️ 브랜드: 구 KittyCAD (현 Zoo)</div>
+                <div class="meta-item">🤖 분석 도구: Antigravity Subagent System</div>
+            </div>
+        </header>
+
+        <!-- SECTION 1 -->
+        <div class="section-header">
+            <div class="section-title">1. 개요 및 핵심 비전 (Overview & Core Vision)</div>
+            <div class="section-badge">Core Concept</div>
+        </div>
+
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🚀</span> Zoo (zoo.dev) 란?
+                </div>
+                <p style="color: var(--text-muted);">
+                    Zoo(구 KittyCAD)는 폐쇄적인 바이너리 파일과 전통적 GUI 위주의 CAD 환경을 탈피하고, <strong>코드 중심(Code-First) & 클라우드 네이티브 파라메트릭 CAD 인프라</strong>를 구축하는 차세대 하드웨어 설계 플랫폼입니다.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🎯</span> 비전 & 핵심 가치
+                </div>
+                <p style="color: var(--text-muted);">
+                    <strong>"하드웨어 설계는 소프트웨어 개발만큼 프로그래머블하고 개방적이어야 한다."</strong><br>
+                    Git을 통한 버전 관리, 코드 차이점 비교(Diff), 자동화 테스트(CI/CD), AI 에이전트를 CAD 설계 워크플로우에 완벽 통합합니다.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">👥</span> 타겟 사용자층
+                </div>
+                <ul>
+                    <li><strong>기계/하드웨어 엔지니어:</strong> 파라메트릭 및 코드 기반 설계자</li>
+                    <li><strong>소프트웨어 개발자:</strong> CAD 자동화 툴 및 Web 3D 커스텀 앱 개발자</li>
+                    <li><strong>로봇공학자 & AI 연구원:</strong> 정밀 3D 모델링 생성 및 자동화 검증 엔지니어</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="section-header">
+            <div class="section-title">2. 지오메트리 엔진 & 수학적 아키텍처 (Geometry Kernel)</div>
+            <div class="section-badge">GPU Native Kernel</div>
+        </div>
+
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-title"><span class="icon">📐</span> 레거시 C++ 커널 vs Zoo GPU-Native Kernel 비교</div>
+            <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+                기존 레거시 CAD 커널(Siemens Parasolid, Dassault ACIS, OpenCASCADE 등)은 1980~1990년대에 설계되어 단일 쓰레드 CPU 연산에 의존하며, 메모리 관리가 취약하고 병렬화가 어렵습니다. Zoo는 <strong>Rust</strong> 언어로 처음부터 재작성하여 <strong>GPU 가속(Vulkan / WebGPU)</strong> 및 스레드 안전성을 확보했습니다.
+            </p>
+            <div class="grid-3" style="margin-bottom: 0;">
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">B-Rep 위상 구조 (Topology)</h4>
+                    <p style="font-size: 0.875rem; color: var(--text-muted);">
+                        Polygon Mesh(STL/OBJ)의 모호한 정점 집합이 아닌 <code>Solid -> Shell -> Face -> Loop -> Edge -> Vertex</code> 정밀 B-Rep 구조를 GPU 데이터 구조체로 직접 매핑하여 연산합니다.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color: var(--secondary); margin-bottom: 0.5rem;">GPU 가속 SSI (Surface-Surface Intersect)</h4>
+                    <p style="font-size: 0.875rem; color: var(--text-muted);">
+                        NURBS 곡면 간 교차선을 구하는 SSI 연산을 GPU 병렬 컴퓨팅 셰이더로 수천 개 레이를 동시에 교차 계산하여 불리언 연산(Combine/Cut) 속도를 수십 배 향상시킵니다.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color: var(--success); margin-bottom: 0.5rem;">메모리 안전성 & WASM 컴파일</h4>
+                    <p style="font-size: 0.875rem; color: var(--text-muted);">
+                        Rust의 Strict Ownership 개념으로 Pointer/Buffer Overflow 및 race condition을 근본 차단하며, 동일 코드를 WebAssembly(WASM)로 컴파일하여 브라우저 로컬에서도 로직을 사전 평가합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram-container">
+[ 3D CAD Geometry Kernel Architecture Overview ]
+
++-----------------------------------------------------------------------------------+
+|                            Zoo Design Studio (GUI / Code)                         |
++-----------------------------------------------------------------------------------+
+                                         |  (WebSocket / WebRTC)
+                                         v
++-----------------------------------------------------------------------------------+
+|                            Zoo Cloud Kernel Engine (Rust)                         |
+|                                                                                   |
+|   +-----------------------+     +------------------------+    +---------------+   |
+|   | KCL AST / IR Compiler | --> | 2D/3D Constraint Solver| -> | B-Rep Builder |   |
+|   +-----------------------+     +------------------------+    +---------------+   |
+|                                                                       |           |
+|                                                                       v           |
+|                                                       +-----------------------+   |
+|                                                       | GPU Vulkan SSI Engine |   |
+|                                                       +-----------------------+   |
++-----------------------------------------------------------------------------------+
+                                         |  (Frame Buffer Export)
+                                         v
++-----------------------------------------------------------------------------------+
+|                        WebRTC H.264/VP8 Realtime Stream to Canvas                 |
++-----------------------------------------------------------------------------------+
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="section-header">
+            <div class="section-title">3. KCL (KittyCAD Language) 컴파일러 & 구문 스펙</div>
+            <div class="section-badge">Compiler Spec</div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.75rem;">
+            <div class="card-title"><span class="icon">💻</span> KCL 파이프라인 및 파이프 연산자(`|>`) 매커니즘</div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                KCL은 파라메트릭 기하 정의에 최적화된 함수형/선언형 믹스 언어입니다. 파이프 연산자(<code>|></code>)와 플레이스홀더(<code>%</code>)를 활용하여 이전 기하 개체를 다음 모델링 명령의 입력으로 투명하게 전달합니다.
+            </p>
+            <div class="grid-2" style="margin-bottom: 0;">
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">KCL 컴파일 단계 (Compilation Stages)</h4>
+                    <ol style="font-size: 0.9rem; color: var(--text-muted);">
+                        <li><strong>Lexing & Parsing:</strong> KCL 소스코드를 토큰화하여 AST(Abstract Syntax Tree) 구축</li>
+                        <li><strong>Constraint Solving:</strong> 2D 스케치 내의 미결정 구속조건(Underspecified constraints)을 수치 솔버가 자동으로 풀이</li>
+                        <li><strong>IR Generation:</strong> 플랫폼 독립적 Modeling Command IR(중간 표현) 생성</li>
+                        <li><strong>Engine Execution:</strong> WebSocket을 통해 Cloud Kernel로 명령 패킷 전송</li>
+                    </ol>
+                </div>
+                <div>
+                    <h4 style="color: var(--secondary); margin-bottom: 0.5rem;">주요 언어적 특성 (Language Features)</h4>
+                    <ul style="font-size: 0.9rem; color: var(--text-muted);">
+                        <li><strong>Variables & Units:</strong> <code>const r = 15mm</code> (단위 자동 변환 지원)</li>
+                        <li><strong>Sketch Plane Binding:</strong> <code>startSketchOn('XY')</code> 또는 <code>startSketchOn(face)</code></li>
+                        <li><strong>Solid Operations:</strong> <code>extrude</code>, <code>revolve</code>, <code>sweep</code>, <code>loft</code></li>
+                        <li><strong>Feature Array:</strong> <code>patternLinear3d</code>, <code>patternCircular3d</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="color: #fff; margin: 1.5rem 0 0.75rem 0; font-size: 1.25rem;">📜 KCL 프로그래밍 예제: 복합 플랜지 부품 (Flange Component)</h3>
+        <pre><code><span style="color: #6b7280;">// 1. 설계 파라미터 및 단위 정의</span>
+<span style="color: #f472b6;">const</span> outerRadius = <span style="color: #f87171;">50mm</span>
+<span style="color: #f472b6;">const</span> innerRadius = <span style="color: #f87171;">25mm</span>
+<span style="color: #f472b6;">const</span> flangeThickness = <span style="color: #f87171;">12mm</span>
+<span style="color: #f472b6;">const</span> boltCircleRadius = <span style="color: #f87171;">38mm</span>
+<span style="color: #f472b6;">const</span> boltCount = <span style="color: #f87171;">6</span>
+<span style="color: #f472b6;">const</span> boltHoleRadius = <span style="color: #f87171;">4mm</span>
+
+<span style="color: #6b7280;">// 2. 기본 플랜지 바디 스케치 및 압출</span>
+baseProfile = <span style="color: #38bdf8;">startSketchOn</span>(<span style="color: #fbbf24;">'XY'</span>)
+  |> <span style="color: #c084fc;">circle</span>(center = [<span style="color: #f87171;">0</span>, <span style="color: #f87171;">0</span>], radius = outerRadius, %)
+  |> <span style="color: #c084fc;">hole</span>(<span style="color: #c084fc;">circle</span>(center = [<span style="color: #f87171;">0</span>, <span style="color: #f87171;">0</span>], radius = innerRadius, %), %)
+
+flangeBody = baseProfile |> <span style="color: #c084fc;">extrude</span>(flangeThickness, %)
+
+<span style="color: #6b7280;">// 3. 원형 배열을 이용한 볼트 구멍 타공 및 필렛 처리</span>
+boltHoleCutout = <span style="color: #38bdf8;">startSketchOn</span>(flangeBody, <span style="color: #fbbf24;">'END'</span>)
+  |> <span style="color: #c084fc;">circle</span>(center = [<span style="color: #f87171;">0</span>, boltCircleRadius], radius = boltHoleRadius, %)
+  |> <span style="color: #c084fc;">extrude</span>(-flangeThickness, %)
+  |> <span style="color: #c084fc;">patternCircular3d</span>(axis = [<span style="color: #f87171;">0</span>, <span style="color: #f87171;">0</span>, <span style="color: #f87171;">1</span>], count = boltCount, center = [<span style="color: #f87171;">0</span>, <span style="color: #f87171;">0</span>, <span style="color: #f87171;">0</span>], %)
+
+<span style="color: #6b7280;">// 4. 모서리 R2mm 필렛(Fillet) 적용하여 최종 반환</span>
+finalPart = boltHoleCutout |> <span style="color: #c084fc;">fillet</span>(radius = <span style="color: #f87171;">2mm</span>, tags = [<span style="color: #fbbf24;">'outerEdges'</span>], %)</code></pre>
+
+        <!-- SECTION 4 -->
+        <div class="section-header">
+            <div class="section-title">4. Text-to-CAD Agentic ML 파이프라인 (Zookeeper)</div>
+            <div class="section-badge">AI Architecture</div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><span class="icon">🤖</span> Plan-Act-Observe-Update 피드백 루프</div>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">
+                    Zoo의 AI 에이전트 <strong>Zookeeper</strong>는 단순 원샷(One-shot) 텍스트 생성이 아닌, 자가 진단 및 피드백 루프를 구동합니다.
+                </p>
+                <ol style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.75rem;">
+                    <li><strong>Plan:</strong> 사용자 프롬프트에서 부품 치수, 기하학적 형상 구속 조건 파악</li>
+                    <li><strong>Act:</strong> 초안 KCL AST 파싱 및 KCL 소스 코드 생성</li>
+                    <li><strong>Observe:</strong> Cloud Geometry Engine으로 KCL 실행 후 비정상 위상(Self-intersection, Open Profile)이나 컴파일 에러 수집</li>
+                    <li><strong>Update:</strong> 컴파일 오류 메시지와 기하 실패 결과를 LLM 컨텍스트에 재투입하여 자가 수정(Self-Correction) 반복</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span class="icon">📦</span> B-Rep (STEP) vs Mesh Generative AI 비교</div>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">
+                    대다수 3D AI(Midjourney 3D, Meshy 등)는 메시(Mesh/Point Cloud) 형태의 모호한 표면 껍데기만 출력하여 CAD 수정이 불가능합니다.
+                </p>
+                <div class="tech-box" style="margin-top: 0.75rem; padding: 1rem;">
+                    <strong style="color: var(--secondary);">Zoo의 B-Rep 생성 우위성:</strong><br>
+                    1. STEP / IGES 표준 산업 포맷 완벽 호환<br>
+                    2. CNC 가공 공구 경로(G-code) 및 CAM 연동 가능<br>
+                    3. KCL 파라미터만 고치면 치수(Dimension) 즉시 수정
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="section-header">
+            <div class="section-title">5. 통신 프로토콜 & API 아키텍처 (Networking & API)</div>
+            <div class="section-badge">Protocol Spec</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>통신 프로토콜</th>
+                        <th>엔드포인트 / 채널</th>
+                        <th>주요 기능 및 용도</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>실시간 모델링</strong></td>
+                        <td><span class="badge-primary">WebSocket (JSON-RPC)</span></td>
+                        <td><code>wss://api.zoo.dev/modeling/commands</code></td>
+                        <td>스케치, Extrude, Fillet 등 100+ 모델링 명령 패킷 수발신 및 3D 위상 업데이트</td>
+                    </tr>
+                    <tr>
+                        <td><strong>실시간 3D 뷰포트</strong></td>
+                        <td><span class="badge-success">WebRTC Video</span></td>
+                        <td><code>RTCDataChannel & MediaStream</code></td>
+                        <td>클라우드 GPU에서 렌더링된 H.264/VP8 비디오 스트림을 Canvas로 60fps 저지연 전송</td>
+                    </tr>
+                    <tr>
+                        <td><strong>파일 포맷 변환 API</strong></td>
+                        <td>REST API (HTTP/2)</td>
+                        <td><code>POST /file/conversion/{src}/{dest}</code></td>
+                        <td>STEP, IGES, SLDPRT, OBJ, STL, glTF, DXF 상호 변환 파이프라인 처리</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Text-to-CAD API</strong></td>
+                        <td>REST API (HTTP/2)</td>
+                        <td><code>POST /ai/text-to-cad/{output_format}</code></td>
+                        <td>자연어 입력 기반 KCL 코드 및 CAD 3D 파일 비동기 생성 요청</td>
+                    </tr>
+                    <tr>
+                        <td><strong>질량/부피 해석 API</strong></td>
+                        <td>REST API (HTTP/2)</td>
+                        <td><code>POST /modeling/mass-properties</code></td>
+                        <td>질량(Mass), 부피(Volume), 표면적, 관성모멘트(Moment of Inertia) 정밀 계산</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 6 -->
+        <div class="section-header">
+            <div class="section-title">6. 주요 사용 방법 (Usage & Client SDKs)</div>
+            <div class="section-badge">How to Use</div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><span class="icon">🖥️</span> Zoo Design Studio (GUI + Code)</div>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">
+                    <strong>GUI + Code 듀얼 인터페이스:</strong><br>
+                    화면 한쪽의 3D 뷰포트에서 마우스 클릭으로 스케치하면 반대쪽 코드 창에 KCL 코드가 실시간 자동 작성되고, 반대로 KCL 코드를 직접 입력하면 3D 뷰포트가 실시간 업데이트됩니다.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="icon">💬</span> Text-to-CAD (AI 대화창)</div>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">
+                    <strong>자연어 프롬프트 입력:</strong><br>
+                    Zookeeper AI 대화창에 <em>"두께 5mm, 모서리 4곳에 M4 나사 구멍이 뚫린 100x60mm 마운팅 플레이트를 만들어줘"</em> 와 같이 입력하면 완벽히 파라메트릭화된 모델이 즉시 생성됩니다.
+                </p>
+            </div>
+        </div>
+
+        <h3 style="color: #fff; margin: 1.5rem 0 0.75rem 0; font-size: 1.25rem;">🐍 Python Client SDK 연동 예시</h3>
+        <pre><code><span style="color: #f472b6;">from</span> kittycad <span style="color: #f472b6;">import</span> KittyCAD
+
+<span style="color: #6b7280;"># 환경변수 ZOO_API_TOKEN 또는 KITTYCAD_API_TOKEN 자동 로드</span>
+client = KittyCAD()
+
+<span style="color: #6b7280;"># 비동기 파일 변환 및 지오메트리 계산 요청</span>
+print(<span style="color: #fbbf24;">"Zoo API Client Initialized Successfully."</span>)</code></pre>
+
+        <!-- SECTION 7 -->
+        <div class="section-header">
+            <div class="section-title">7. 상세 설치 및 환경 설정 가이드 (Installation & Setup)</div>
+            <div class="section-badge">Practical Setup</div>
+        </div>
+
+        <ul class="step-list">
+            <li class="step-item">
+                <strong style="color: #fff; font-size: 1.15rem;">Zoo Design Studio (GUI / Desktop / Web)</strong>
+                <p style="color: var(--text-muted); margin-top: 0.35rem;">
+                    • <strong>웹 서비스:</strong> 별도 설치 없이 브라우저에서 바로 사용 ➔ <a href="https://app.zoo.dev" target="_blank" style="color: var(--primary);">https://app.zoo.dev</a><br>
+                    • <strong>macOS (Homebrew Cask):</strong> <code>brew install --cask zoo-design-studio</code><br>
+                    • <strong>독립 패키지 설치:</strong> 공식 사이트 <a href="https://zoo.dev/design-studio" target="_blank" style="color: var(--primary);">https://zoo.dev/design-studio</a>에서 macOS (.dmg), Windows (.exe), Linux 패키지 다운로드
+                </p>
+            </li>
+            <li class="step-item">
+                <strong style="color: #fff; font-size: 1.15rem;">Zoo CLI (`zoo`) 설치 및 인증</strong>
+                <p style="color: var(--text-muted); margin-top: 0.35rem;">
+                    • <strong>macOS (Homebrew):</strong>
+                    <pre style="margin: 0.5rem 0;"><code>brew tap kittycad/kittycad
+brew install kittycad</code></pre>
+                    • <strong>대화형 터미널 로그인:</strong> <code>zoo auth login</code> (브라우저 인증 완료 후 토큰 자동 저장)<br>
+                    • <strong>환경변수 수동 설정:</strong> <code>export ZOO_API_TOKEN="your_token_here"</code> (또는 <code>KITTYCAD_API_TOKEN</code>)<br>
+                    • <strong>API 토큰 관리:</strong> 대시보드 주소 ➔ <a href="https://zoo.dev/account/developer" target="_blank" style="color: var(--primary);">https://zoo.dev/account/developer</a>
+                </p>
+            </li>
+            <li class="step-item">
+                <strong style="color: #fff; font-size: 1.15rem;">개발언어별 공식 SDK 설치 명령어</strong>
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 0.75rem; margin-bottom: 0;">
+                    <div style="background: var(--code-bg); padding: 1rem; border-radius: 0.6rem; border: 1px solid var(--border-color);">
+                        <span style="color: var(--primary); font-weight: 700; font-size: 0.95rem;">Python</span><br>
+                        <code style="display: block; margin-top: 0.4rem;">pip install kittycad</code>
+                    </div>
+                    <div style="background: var(--code-bg); padding: 1rem; border-radius: 0.6rem; border: 1px solid var(--border-color);">
+                        <span style="color: var(--secondary); font-weight: 700; font-size: 0.95rem;">TypeScript / Node</span><br>
+                        <code style="display: block; margin-top: 0.4rem;">npm install @kittycad/lib</code>
+                    </div>
+                    <div style="background: var(--code-bg); padding: 1rem; border-radius: 0.6rem; border: 1px solid var(--border-color);">
+                        <span style="color: var(--accent); font-weight: 700; font-size: 0.95rem;">Rust</span><br>
+                        <code style="display: block; margin-top: 0.4rem;">cargo add kittycad</code>
+                    </div>
+                    <div style="background: var(--code-bg); padding: 1rem; border-radius: 0.6rem; border: 1px solid var(--border-color);">
+                        <span style="color: var(--success); font-weight: 700; font-size: 0.95rem;">Go</span><br>
+                        <code style="display: block; margin-top: 0.4rem;">go get github.com/KittyCAD/kittycad.go</code>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <!-- SECTION 8 -->
+        <div class="section-header">
+            <div class="section-title">8. 비용 및 요금 체계 상세 분석 (Pricing & Quotas)</div>
+            <div class="section-badge">Plans & Cost</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>플랜 구분</th>
+                        <th>대상 사용자</th>
+                        <th>주요 제공 혜택 및 비용</th>
+                        <th>Zookeeper AI (Text-to-CAD)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Studio Free</strong></td>
+                        <td>개인 / 학생 / 입문자</td>
+                        <td><span class="badge-success">무료 (Free Download)</span><br>Zoo Design Studio 데스크톱 및 웹 앱 전기능 접근</td>
+                        <td>월 <strong>20분 무료 AI 추론 시간</strong> 제공</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Team Plan</strong></td>
+                        <td>기업 / 전문 설계 팀</td>
+                        <td><strong>월 $399 / 사용자</strong><br>팀 워크스페이스, 고급 협업 및 Enterprise SSO 지원</td>
+                        <td><span class="badge-success">무제한 Zookeeper AI 추론</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Developer API</strong></td>
+                        <td>소프트웨어 개발자 / 자동화 파이프라인</td>
+                        <td>월 20분 무료 API 시간 제공 후<br><strong>Pay-As-You-Go 종량제 (분당 약 $0.50)</strong></td>
+                        <td>사용한 Compute 초/분 단위로 정밀 차등 청구</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 9 -->
+        <div class="section-header">
+            <div class="section-title">9. 대표 CAD 시스템과의 기술 벤치마크 (Comparison Matrix)</div>
+            <div class="section-badge">Benchmarking</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>비교 항목</th>
+                        <th>Zoo (zoo.dev)</th>
+                        <th>Fusion 360 (Autodesk)</th>
+                        <th>SolidWorks (Dassault)</th>
+                        <th>OpenSCAD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>핵심 지오메트리 커널</strong></td>
+                        <td><span class="badge-primary">Zoo Rust Kernel (GPU Native)</span></td>
+                        <td>ShapeManager (CPU C++)</td>
+                        <td>Parasolid (CPU C++)</td>
+                        <td>CSG / CGAL (CPU C++)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>모델 저장 포맷</strong></td>
+                        <td><span class="badge-success">KCL Plain Text (Git Diff 가능)</span></td>
+                        <td>F3D (바이너리 클라우드)</td>
+                        <td>SLDPRT / SLDASM (바이너리)</td>
+                        <td>SCAD (텍스트 소스)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AI 통합 (Text-to-CAD)</strong></td>
+                        <td><span class="badge-success">네이티브 Zookeeper Agent (B-Rep)</span></td>
+                        <td>서드파티 플러그인 제한적</td>
+                        <td>없음 / 기본 마크업 수준</td>
+                        <td>없음</td>
+                    </tr>
+                    <tr>
+                        <td><strong>개발자 API & SDK</strong></td>
+                        <td><span class="badge-success">REST, WS, Python, TS, Rust, Go</span></td>
+                        <td>Python / C++ API (GUI 내)</td>
+                        <td>VBA / COM API (Windows 전용)</td>
+                        <td>CLI 전용</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CI/CD 자동화 지원</strong></td>
+                        <td><span class="badge-success">완벽 지원 (GitHub Actions)</span></td>
+                        <td>불가 (Headless 구동 불가)</td>
+                        <td>불가 (GUI 라이선스 필수)</td>
+                        <td>스크립트 가능 (기능 제약)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>어셈블리 / FEA 성숙도</strong></td>
+                        <td><span class="badge-warning">성장 단계 (Basic Mates)</span></td>
+                        <td>매우 높음 (FEA/CAM 내장)</td>
+                        <td>최고 수준 (산업 표준)</td>
+                        <td>없음 (CSG 결합)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 10 -->
+        <div class="section-header">
+            <div class="section-title">10. CI/CD 파이프라인 자동화 예시 (GitHub Actions)</div>
+            <div class="section-badge">Automation</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="icon">🔄</span> Git Commit 시 하드웨어 CAD 치수 & 질량 자동 검증</div>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+                Zoo CLI를 사용하면 소프트웨어 CI/CD처럼 Git Push 발생 시 KCL 부품의 질량이 허용 범위를 초과하는지 자동 파이프라인 검사를 수행할 수 있습니다.
+            </p>
+            <pre><code><span style="color: #6b7280;"># .github/workflows/cad-validation.yml</span>
+<span style="color: #f472b6;">name</span>: CAD Automated Quality Gate
+
+<span style="color: #f472b6;">on</span>: [push, pull_request]
+
+<span style="color: #f472b6;">jobs</span>:
+  <span style="color: #38bdf8;">validate-hardware</span>:
+    <span style="color: #f472b6;">runs-on</span>: ubuntu-latest
+    <span style="color: #f472b6;">steps</span>:
+      - <span style="color: #f472b6;">uses</span>: actions/checkout@v3
+
+      - <span style="color: #f472b6;">name</span>: Install Zoo CLI
+        <span style="color: #f472b6;">uses</span>: KittyCAD/action-install-cli@v1
+
+      - <span style="color: #f472b6;">name</span>: Check KCL Part Mass & Volume
+        <span style="color: #f472b6;">env</span>:
+          <span style="color: #fbbf24;">ZOO_API_TOKEN</span>: ${{ secrets.ZOO_API_TOKEN }}
+        <span style="color: #f472b6;">run</span>: |
+          zoo mass models/flange.kcl --material aluminum-6061 --max-mass 150g
+          zoo export models/flange.kcl --format step --output dist/flange.step</code></pre>
+        </div>
+
+        <!-- SECTION 11 -->
+        <div class="section-header">
+            <div class="section-title">11. 장단점 심층 분석 (Pros & Cons)</div>
+            <div class="section-badge">Comparison</div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card" style="border-top: 4px solid var(--success);">
+                <div class="card-title" style="color: var(--success);">
+                    <span class="icon">👍</span> 장점 (Key Advantages)
+                </div>
+                <ul>
+                    <li><strong>Git 친화적 코드 관리:</strong> 바이너리가 아닌 텍스트(KCL)로 모델이 저장되어 Git PR, Diff, Branching이 완벽하게 구동됨.</li>
+                    <li><strong>정밀 제조용 B-Rep AI:</strong> 단순 폴리곤 메시가 아닌 STEP 변환이 가능한 정밀 파라메트릭 CAD 모델 생성.</li>
+                    <li><strong>클라우드 GPU 가속:</strong> 저사양 컴퓨터나 브라우저에서도 WebRTC 비디오 스트리밍을 통해 고성능 3D 조작 가능.</li>
+                    <li><strong>완벽한 개방형 API 생태계:</strong> REST, WebSocket, CLI 및 4개 국어 SDK 지원으로 파이프라인 자동화 용이.</li>
+                    <li><strong>실시간 양방향 동기화:</strong> GUI 조작과 KCL 코드 간의 오차 없는 실시간 반영.</li>
+                </ul>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--warning);">
+                <div class="card-title" style="color: var(--warning);">
+                    <span class="icon">⚠️</span> 단점 및 한계점 (Limitations)
+                </div>
+                <ul>
+                    <li><strong>인터넷 연결 필수:</strong> 지오메트리 엔진 및 렌더링이 클라우드 GPU에서 구동되므로 오프라인 사용 제약.</li>
+                    <li><strong>생태계 성숙도 격차:</strong> SolidWorks, Fusion 360 대비 complex assembly, FEA 시뮬레이션, 고급 CAM 연동 기능은 아직 발전하는 과정임.</li>
+                    <li><strong>KCL 프로그래밍 학습 곡선:</strong> 마우스 클릭 중심의 레거시 CAD 사용자에게는 코딩 방식에 적응할 시간이 필요함.</li>
+                    <li><strong>네트워크 지연 영향:</strong> 네트워크 품질에 따라 WebRTC 스트리밍 및 반응 속도의 미세한 차이 발생.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECTION 12 -->
+        <div class="section-header">
+            <div class="section-title">12. 총평 및 엔지니어링 최종 제언 (Conclusion)</div>
+            <div class="section-badge">Final Judgment</div>
+        </div>
+
+        <div class="card">
+            <p style="color: var(--text-main); font-size: 1.05rem; margin-bottom: 1.25rem;">
+                <strong>Zoo (zoo.dev)는 하드웨어 CAD 산업을 30년 만에 파괴적으로 혁신하는 소프트웨어 1st 지오메트리 인프라입니다.</strong>
+            </p>
+            <div class="grid-2" style="margin-bottom: 1rem;">
+                <div class="highlight-box" style="margin: 0;">
+                    <strong style="color: var(--primary);">핵심도입 추천 분야:</strong><br>
+                    • 파라메트릭 표준 부품 라이브러리 자동화<br>
+                    • Git CI/CD 기반 품질 검증 하드웨어 파이프라인<br>
+                    • 웹 기반 3D 커스텀 부품 주문/설계 서비스 구축<br>
+                    • AI 자연어 프롬프트 기반 B-Rep 초안 CAD 생성
+                </div>
+                <div class="warning-box" style="margin: 0;">
+                    <strong style="color: var(--warning);">도입 시 유의사항:</strong><br>
+                    • 오프라인 전용 사내 망 환경에서는 사용 불가 (클라우드 GPU 필수)<br>
+                    • 수만 개 부품의 수퍼 대형 어셈블리 및 FEA/CAM 시뮬레이션은 레거시 CAD와 병행 권장
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="https://zoo.dev/docs" target="_blank" class="link-button">
+                    📚 Zoo 공식 깃허브 & API 레퍼런스 문서 둘러보기 ↗
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 ENDOCRAB Project - Master Technical Reference & Practical Guide</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-sub);">Synthesized & Unified by Antigravity Multi-Agent Research System</p>
+        </footer>
+    </div>
+</body>
+</html>

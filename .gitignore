@@ -1,0 +1,56 @@
+# ==========================================
+# Python & Virtual Environments
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+*.egg-info/
+dist/
+build/
+
+# ==========================================
+# Antigravity Local AI System Data
+# ==========================================
+.gemini/antigravity/
+
+# ==========================================
+# Scratchpad & Temporary Scrapes
+# ==========================================
+scratch/
+scratch_yt.html
+제목 없음.png
+
+# ==========================================
+# Temporary Output Dumps & Transient Scripts
+# ==========================================
+output/*.ps1
+output/*.txt
+output/*.json
+output/inspect_code.py
+output/inspect_state.json
+
+# ==========================================
+# Credentials & Secrets
+# ==========================================
+token.txt
+*.key
+*.pem
+.env
+.env.*
+
+# ==========================================
+# IDE & System Files
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
